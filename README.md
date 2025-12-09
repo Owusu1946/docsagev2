@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/Owusu1946/docsagev2/main/assets/docsage-logo.png" alt="docsagev2 Logo" width="150"/>
+  <img src="https://raw.githubusercontent.com/Owusu1946/docsagev2/main/src/assets/docsage-logo.png" alt="docsagev2 Logo" width="150"/>
 </p>
 
 <h1 align="center">docsagev2</h1>
