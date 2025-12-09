@@ -97,20 +97,22 @@ const openDiffInEditor = (originalPath: string, newPath: string): void => {
         const absOriginal = path.resolve(originalPath);
         const absNew = path.resolve(newPath);
 
-        // On Windows, we need shell: true for 'code' command to work
-        // But we must properly quote paths to handle spaces
         const isWindows = process.platform === 'win32';
 
         if (isWindows) {
-            // Use cmd /c to properly execute the VS Code command on Windows
-            const child = spawn('cmd', ['/c', 'code', '--diff', absOriginal, absNew], {
+            // On Windows, use shell: true with properly quoted paths
+            // This ensures paths with spaces are handled correctly
+            const command = `code --diff "${absOriginal}" "${absNew}"`;
+            const child = spawn(command, [], {
                 detached: true,
                 stdio: 'ignore',
+                shell: true,
                 windowsHide: true
             });
             child.unref();
         } else {
             // On Unix-like systems, spawn directly without shell
+            // Arguments are passed as array, so spaces are handled correctly
             const child = spawn('code', ['--diff', absOriginal, absNew], {
                 detached: true,
                 stdio: 'ignore'

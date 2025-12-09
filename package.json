@@ -1,6 +1,6 @@
 {
   "name": "docsagev2",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "AI-powered CLI tool that automatically generates professional README.md, CONTRIBUTING.md, and LICENSE files using Google Gemini AI",
   "main": "dist/src/index.js",
   "scripts": {
