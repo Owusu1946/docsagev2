@@ -14,13 +14,45 @@ export class GeminiService {
         this.model = this.genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
     }
 
-    async generateReadme(cwd: string, projectName: string, options: { style: string; includeBadges: boolean; sections?: string[]; includeArchitectureDiagram?: boolean; includeERD?: boolean; includeContributingDiagram?: boolean } = { style: 'Professional', includeBadges: true }, onProgress?: (msg: string) => void): Promise<string> {
+    async generateReadme(
+        cwd: string,
+        projectName: string,
+        options: {
+            style: string;
+            includeBadges: boolean;
+            sections?: string[];
+            includeArchitectureDiagram?: boolean;
+            includeERD?: boolean;
+            includeContributingDiagram?: boolean;
+            mergeDocs?: boolean;
+            licenseType?: string;
+            author?: string;
+        } = { style: 'Professional', includeBadges: true },
+        onProgress?: (msg: string) => void
+    ): Promise<string> {
         const structure = await getProjectStructure(cwd);
         const keyFiles = await getKeyFilesContent(cwd, onProgress);
 
-        if (onProgress) onProgress('Analyzing project relationships and context based on 2.5-flash model...');
+        if (onProgress) onProgress('Analyzing project relationships and context...');
 
         const sectionsText = options.sections ? options.sections.join(', ') : 'All standard sections';
+
+        let unifiedInstructions = '';
+        if (options.mergeDocs) {
+            unifiedInstructions = `
+      UNIFIED MODE ENABLED:
+      - The "Contributing (Full)" section should contain COMPLETE contribution guidelines including:
+        * How to report bugs
+        * How to request features
+        * Development setup instructions
+        * Code style guidelines
+        * Pull Request process
+        * Use a Mermaid gitGraph or sequenceDiagram for the PR workflow
+      - The "License (Full Text)" section should contain the COMPLETE ${options.licenseType || 'MIT'} license text.
+        * Copyright Year: ${new Date().getFullYear()}
+        * Copyright Holder: ${options.author || 'The Maintainers'}
+      `;
+        }
 
         const prompt = `
       ${README_PROMPT}
@@ -32,6 +64,7 @@ export class GeminiService {
       - Include Mermaid Architecture Diagram: ${options.includeArchitectureDiagram ?? false}
       - Include Mermaid ERD: ${options.includeERD ?? false}
       - Include Mermaid Contributing Flow: ${options.includeContributingDiagram ?? false}
+      ${unifiedInstructions}
 
       Project Name: ${projectName}
       
@@ -42,19 +75,27 @@ export class GeminiService {
       ${keyFiles}
     `;
 
-        if (onProgress) onProgress('Generating README content with Gemini 2.5-flash...');
+        if (onProgress) onProgress('Generating README content with Gemini...');
         const result = await this.model.generateContent(prompt);
         const response = await result.response;
         return response.text();
     }
 
-    async generateContributing(cwd: string, onProgress?: (msg: string) => void): Promise<string> {
+    async generateContributing(
+        cwd: string,
+        options: { codeOfConduct: string; includeTemplates: boolean } = { codeOfConduct: 'Contributor Covenant', includeTemplates: false },
+        onProgress?: (msg: string) => void
+    ): Promise<string> {
         const keyFiles = await getKeyFilesContent(cwd, onProgress);
 
         if (onProgress) onProgress('Analyzing project context for contribution guidelines...');
 
         const prompt = `
       ${CONTRIBUTING_PROMPT}
+
+      Configuration:
+      - Code of Conduct: ${options.codeOfConduct} (Include this code of conduct, or omit if "None")
+      - Include Issue/PR Templates: ${options.includeTemplates} (If true, add example templates in markdown code blocks)
 
       Project Context (Key Files):
       ${keyFiles}
@@ -66,19 +107,21 @@ export class GeminiService {
         return response.text();
     }
 
-    async generateLicense(cwd: string, author: string = 'The Maintainers', onProgress?: (msg: string) => void): Promise<string> {
-        if (onProgress) onProgress('Analyzing package.json for license info...');
+    async generateLicense(
+        cwd: string,
+        options: { licenseType: string; author: string } = { licenseType: 'MIT', author: 'The Maintainers' },
+        onProgress?: (msg: string) => void
+    ): Promise<string> {
+        if (onProgress) onProgress(`Generating ${options.licenseType} license...`);
+
         const prompt = `
       You are an expert in open source licensing.
-      Generate a LICENSE file for this project.
+      Generate the COMPLETE and EXACT text for the ${options.licenseType} license.
       
-      If a license is specified in package.json, use that.
-      If not, default to MIT License.
-      
-      Copyright Holder: ${author}
+      Copyright Holder: ${options.author}
       Year: ${new Date().getFullYear()}
 
-      Output ONLY the license text.
+      Output ONLY the license text, nothing else. No markdown formatting, no explanations.
     `;
 
         if (onProgress) onProgress('Generating LICENSE text...');

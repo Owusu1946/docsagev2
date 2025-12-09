@@ -7,6 +7,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import figlet from 'figlet';
 import gradient from 'gradient-string';
+import { spawn } from 'child_process';
 import { GeminiService } from '../services/gemini.js';
 import { logger } from '../utils/logger.js';
 import dotenv from 'dotenv';
@@ -36,27 +37,67 @@ const getApiKey = async (): Promise<string> => {
     return apiKey;
 };
 
+const openDiffInEditor = (originalPath: string, newPath: string): void => {
+    try {
+        // Use spawn with detached to prevent blocking terminal stdin
+        const child = spawn('code', ['--diff', originalPath, newPath], {
+            detached: true,
+            stdio: 'ignore',
+            shell: true
+        });
+        child.unref();
+        console.log(chalk.cyan('\n📝 Diff opened in VS Code editor. Review the changes there.\n'));
+    } catch (error) {
+        console.log(chalk.yellow('\n⚠️ Could not open VS Code. Make sure "code" is in your PATH.\n'));
+    }
+};
+
 const writeToFile = async (filename: string, content: string) => {
     const cwd = process.cwd();
     const filePath = path.join(cwd, filename);
 
-    // Check existence
+    // Check if file exists
     try {
         await fs.access(filePath);
-        const { overwrite } = await inquirer.prompt([
+
+        // Create a temp file with new content for diff
+        const tempDir = path.join(cwd, '.docsage-temp');
+        await fs.mkdir(tempDir, { recursive: true });
+        const tempFilePath = path.join(tempDir, `${filename}.new`);
+        await fs.writeFile(tempFilePath, content, 'utf-8');
+
+        // Open diff in editor
+        openDiffInEditor(filePath, tempFilePath);
+
+        // Small delay to let terminal stabilize after spawning VS Code
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        const { action } = await inquirer.prompt([
             {
-                type: 'confirm',
-                name: 'overwrite',
-                message: `${filename} already exists. Overwrite?`,
-                default: false,
+                type: 'rawlist',
+                name: 'action',
+                message: `${filename} already exists. Review the diff in VS Code, then choose:`,
+                choices: [
+                    { name: 'Accept changes (overwrite with new content)', value: 'accept' },
+                    { name: 'Reject changes (keep original)', value: 'reject' },
+                ],
             },
         ]);
-        if (!overwrite) {
-            logger.warning(`Skipped creating ${filename}`);
+
+        // Clean up temp file
+        try {
+            await fs.unlink(tempFilePath);
+            await fs.rmdir(tempDir);
+        } catch (e) {
+            // Ignore cleanup errors
+        }
+
+        if (action === 'reject') {
+            logger.warning(`Kept original ${filename}`);
             return;
         }
     } catch (e) {
-        // File doesn't exist, proceed
+        // File doesn't exist, proceed with creation
     }
 
     await fs.writeFile(filePath, content, 'utf-8');
@@ -84,9 +125,34 @@ const main = async () => {
     ]);
     const { docTypes } = answers;
 
-    let readmeOptions = { style: 'Professional', includeBadges: true };
+    // Detect Unified Mode: All 3 selected
+    const isUnifiedMode = docTypes.includes('README.md') &&
+        docTypes.includes('CONTRIBUTING.md') &&
+        docTypes.includes('LICENSE');
 
-    if (docTypes.includes('README.md')) {
+    let readmeOptions: any = { style: 'Professional', includeBadges: true, mergeDocs: false };
+    let contributingOptions: any = { codeOfConduct: 'Contributor Covenant', includeTemplates: false };
+    let licenseOptions: any = { licenseType: 'MIT', author: 'The Maintainers' };
+
+    const cwd = process.cwd();
+    const packageJsonPath = path.join(cwd, 'package.json');
+    let projectName = path.basename(cwd);
+
+    try {
+        const pkg = JSON.parse(await fs.readFile(packageJsonPath, 'utf-8'));
+        if (pkg.name) projectName = pkg.name;
+        if (pkg.author) {
+            if (typeof pkg.author === 'string') licenseOptions.author = pkg.author;
+            else if (pkg.author.name) licenseOptions.author = pkg.author.name;
+        }
+    } catch (e) {
+        // package.json might not exist
+    }
+
+    if (isUnifiedMode) {
+        // ===== UNIFIED MODE =====
+        console.log(chalk.cyan('\n📦 Unified Mode: All documentation will be merged into README.md\n'));
+
         const opts = await inquirer.prompt([
             {
                 type: 'checkbox',
@@ -105,8 +171,8 @@ const main = async () => {
                     { name: 'Database Schema' },
                     { name: 'API Reference' },
                     { name: 'Tech Stack', checked: true },
-                    { name: 'Contributing', checked: true },
-                    { name: 'License', checked: true },
+                    { name: 'Contributing (Full)', checked: true },
+                    { name: 'License (Full Text)', checked: true },
                     { name: 'Roadmap' },
                     { name: 'Acknowledgements' },
                 ]
@@ -125,84 +191,164 @@ const main = async () => {
                 when: (answers) => answers.sections && answers.sections.includes('Architecture')
             },
             {
-                type: 'confirm',
-                name: 'includeERD',
-                message: 'Include Mermaid Entity Relationship Diagram (ERD)?',
-                default: false,
-                when: (answers) => answers.sections && answers.sections.includes('Database Schema')
-            },
-            {
-                type: 'confirm',
-                name: 'includeContributingDiagram',
-                message: 'Include Contributing Flow Diagram?',
-                default: false,
-                when: (answers) => answers.sections && answers.sections.includes('Contributing')
+                type: 'list',
+                name: 'licenseType',
+                message: 'Select License Type for the unified document:',
+                choices: ['MIT', 'Apache 2.0', 'ISC', 'GPL-3.0', 'BSD-3-Clause', 'MPL-2.0'],
+                default: 'MIT'
             }
         ]);
-        readmeOptions = { ...opts, style: 'Professional' };
-    }
+        readmeOptions = { ...opts, style: 'Professional', mergeDocs: true };
+        licenseOptions.licenseType = opts.licenseType;
 
-    const cwd = process.cwd();
-    const packageJsonPath = path.join(cwd, 'package.json');
-    let projectName = path.basename(cwd);
-
-    try {
-        const pkg = JSON.parse(await fs.readFile(packageJsonPath, 'utf-8'));
-        if (pkg.name) projectName = pkg.name;
-    } catch (e) {
-        // package.json might not exist
-    }
-
-    if (docTypes.includes('README.md')) {
-        const spinner = ora('Generating README.md...').start();
+        const spinner = ora('Generating Unified README.md...').start();
         try {
-            const readme = await gemini.generateReadme(cwd, projectName, readmeOptions, (msg) => {
+            const readme = await gemini.generateReadme(cwd, projectName, { ...readmeOptions, licenseType: licenseOptions.licenseType, author: licenseOptions.author }, (msg) => {
                 spinner.text = msg;
             });
-            spinner.succeed('README.md generated!');
+            spinner.succeed('Unified README.md generated!');
             await writeToFile('README.md', readme);
         } catch (error) {
-            spinner.fail('Failed to generate README.md');
+            spinner.fail('Failed to generate Unified README.md');
             console.error(error);
         }
-    }
 
-    if (docTypes.includes('CONTRIBUTING.md')) {
-        const spinner = ora('Generating CONTRIBUTING.md...').start();
-        try {
-            const contributing = await gemini.generateContributing(cwd, (msg) => {
-                spinner.text = msg;
-            });
-            spinner.succeed('CONTRIBUTING.md generated!');
-            await writeToFile('CONTRIBUTING.md', contributing);
-        } catch (error) {
-            spinner.fail('Failed to generate CONTRIBUTING.md');
-            console.error(error);
-        }
-    }
+    } else {
+        // ===== STANDALONE MODE =====
 
-    if (docTypes.includes('LICENSE')) {
-        const spinner = ora('Generating LICENSE...').start();
-        try {
-            // Try to get author from package.json
-            let author = 'The Maintainers';
-            const packageJsonPath = path.join(cwd, 'package.json');
-            try {
-                const pkg = JSON.parse(await fs.readFile(packageJsonPath, 'utf-8'));
-                if (pkg.author) {
-                    if (typeof pkg.author === 'string') author = pkg.author;
-                    else if (pkg.author.name) author = pkg.author.name;
+        // README.md
+        if (docTypes.includes('README.md')) {
+            const opts = await inquirer.prompt([
+                {
+                    type: 'checkbox',
+                    name: 'sections',
+                    message: 'Select sections to include:',
+                    choices: [
+                        { name: 'Project Header (Logo, Title, Badges)', checked: true },
+                        { name: 'Table of Contents', checked: true },
+                        { name: 'Overview', checked: true },
+                        { name: 'Features', checked: true },
+                        { name: 'Architecture', checked: true },
+                        { name: 'Prerequisites', checked: true },
+                        { name: 'Installation', checked: true },
+                        { name: 'Usage', checked: true },
+                        { name: 'Configuration', checked: true },
+                        { name: 'Database Schema' },
+                        { name: 'API Reference' },
+                        { name: 'Tech Stack', checked: true },
+                        { name: 'Contributing', checked: true },
+                        { name: 'License', checked: true },
+                        { name: 'Roadmap' },
+                        { name: 'Acknowledgements' },
+                    ]
+                },
+                {
+                    type: 'confirm',
+                    name: 'includeBadges',
+                    message: 'Include Shields.io badges?',
+                    default: true
+                },
+                {
+                    type: 'confirm',
+                    name: 'includeArchitectureDiagram',
+                    message: 'Include Mermaid Architecture Diagram?',
+                    default: true,
+                    when: (answers) => answers.sections && answers.sections.includes('Architecture')
+                },
+                {
+                    type: 'confirm',
+                    name: 'includeERD',
+                    message: 'Include Mermaid Entity Relationship Diagram (ERD)?',
+                    default: false,
+                    when: (answers) => answers.sections && answers.sections.includes('Database Schema')
+                },
+                {
+                    type: 'confirm',
+                    name: 'includeContributingDiagram',
+                    message: 'Include Contributing Flow Diagram?',
+                    default: false,
+                    when: (answers) => answers.sections && answers.sections.includes('Contributing')
                 }
-            } catch (e) { }
+            ]);
+            readmeOptions = { ...opts, style: 'Professional' };
 
-            const license = await gemini.generateLicense(cwd, author, (msg) => {
-                spinner.text = msg;
-            });
-            spinner.succeed('LICENSE generated!');
-            await writeToFile('LICENSE', license);
-        } catch (error) {
-            spinner.fail('Failed to generate LICENSE');
-            console.error(error);
+            const spinner = ora('Generating README.md...').start();
+            try {
+                const readme = await gemini.generateReadme(cwd, projectName, readmeOptions, (msg) => {
+                    spinner.text = msg;
+                });
+                spinner.succeed('README.md generated!');
+                await writeToFile('README.md', readme);
+            } catch (error) {
+                spinner.fail('Failed to generate README.md');
+                console.error(error);
+            }
+        }
+
+        // CONTRIBUTING.md (Standalone Enhanced)
+        if (docTypes.includes('CONTRIBUTING.md')) {
+            console.log(chalk.cyan('\n📝 Configuring CONTRIBUTING.md...\n'));
+            const contribOpts = await inquirer.prompt([
+                {
+                    type: 'list',
+                    name: 'codeOfConduct',
+                    message: 'Select Code of Conduct:',
+                    choices: ['Contributor Covenant', 'Citizen Code of Conduct', 'None'],
+                    default: 'Contributor Covenant'
+                },
+                {
+                    type: 'confirm',
+                    name: 'includeTemplates',
+                    message: 'Include Issue/PR Template examples?',
+                    default: true
+                }
+            ]);
+            contributingOptions = contribOpts;
+
+            const spinner = ora('Generating CONTRIBUTING.md...').start();
+            try {
+                const contributing = await gemini.generateContributing(cwd, contributingOptions, (msg) => {
+                    spinner.text = msg;
+                });
+                spinner.succeed('CONTRIBUTING.md generated!');
+                await writeToFile('CONTRIBUTING.md', contributing);
+            } catch (error) {
+                spinner.fail('Failed to generate CONTRIBUTING.md');
+                console.error(error);
+            }
+        }
+
+        // LICENSE (Standalone Enhanced)
+        if (docTypes.includes('LICENSE')) {
+            console.log(chalk.cyan('\n⚖️ Configuring LICENSE...\n'));
+            const licOpts = await inquirer.prompt([
+                {
+                    type: 'list',
+                    name: 'licenseType',
+                    message: 'Select License Type:',
+                    choices: ['MIT', 'Apache 2.0', 'ISC', 'GPL-3.0', 'BSD-3-Clause', 'MPL-2.0', 'Unlicense'],
+                    default: 'MIT'
+                },
+                {
+                    type: 'input',
+                    name: 'author',
+                    message: 'Copyright Holder:',
+                    default: licenseOptions.author
+                }
+            ]);
+            licenseOptions = licOpts;
+
+            const spinner = ora('Generating LICENSE...').start();
+            try {
+                const license = await gemini.generateLicense(cwd, licenseOptions, (msg) => {
+                    spinner.text = msg;
+                });
+                spinner.succeed('LICENSE generated!');
+                await writeToFile('LICENSE', license);
+            } catch (error) {
+                spinner.fail('Failed to generate LICENSE');
+                console.error(error);
+            }
         }
     }
 };
@@ -211,3 +357,4 @@ main().catch((err) => {
     logger.error(err);
     process.exit(1);
 });
+
