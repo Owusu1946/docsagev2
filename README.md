@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/docsage/docsage2/main/assets/docsage-logo.png" alt="DocSage2 Logo" width="150"/>
+  <img src="https://raw.githubusercontent.com/Owusu1946/doscagev2/main/assets/docsage-logo.png" alt="doscagev2 Logo" width="150"/>
 </p>
 
-<h1 align="center">DocSage2</h1>
+<h1 align="center">doscagev2</h1>
 
 <p align="center">
   <b>🚀 Your AI-Powered Documentation Co-pilot for Rapid Project Documentation Generation! 🚀</b>
@@ -10,12 +10,12 @@
 
 <p align="center">
   <!-- Version Badge -->
-  <a href="https://www.npmjs.com/package/docsage2" target="_blank">
-    <img src="https://img.shields.io/npm/v/docsage2?style=flat-square&color=blue" alt="npm version">
+  <a href="https://www.npmjs.com/package/doscagev2" target="_blank">
+    <img src="https://img.shields.io/npm/v/doscagev2?style=flat-square&color=blue" alt="npm version">
   </a>
   <!-- License Badge -->
-  <a href="https://github.com/docsage/docsage2/blob/main/LICENSE" target="_blank">
-    <img src="https://img.shields.io/github/license/docsage/docsage2?style=flat-square&color=green" alt="License">
+  <a href="https://github.com/Owusu1946/doscagev2/blob/main/LICENSE" target="_blank">
+    <img src="https://img.shields.io/github/license/docsage/doscagev2?style=flat-square&color=green" alt="License">
   </a>
   <!-- Tech Stack Badges -->
   <img src="https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white" alt="TypeScript">
@@ -47,15 +47,15 @@
 
 ## Overview
 
-In the fast-paced world of software development, maintaining up-to-date and comprehensive documentation often becomes an afterthought, leading to knowledge gaps, slowed onboarding, and increased technical debt. `docsage2` addresses this critical challenge by providing an intelligent, AI-powered command-line interface (CLI) tool that automates the generation of various project documentation files.
+In the fast-paced world of software development, maintaining up-to-date and comprehensive documentation often becomes an afterthought, leading to knowledge gaps, slowed onboarding, and increased technical debt. `doscagev2` addresses this critical challenge by providing an intelligent, AI-powered command-line interface (CLI) tool that automates the generation of various project documentation files.
 
-Leveraging the advanced capabilities of the Google Gemini AI, `docsage2` analyzes your project's structure, key files, and dependencies to craft professional `README.md`, `CONTRIBUTING.md`, and `LICENSE` files with minimal effort. This tool empowers developers to focus on coding while ensuring their projects are well-documented, promoting better collaboration and project longevity.
+Leveraging the advanced capabilities of the Google Gemini AI, `doscagev2` analyzes your project's structure, key files, and dependencies to craft professional `README.md`, `CONTRIBUTING.md`, and `LICENSE` files with minimal effort. This tool empowers developers to focus on coding while ensuring their projects are well-documented, promoting better collaboration and project longevity.
 
 ---
 
 ## Features
 
-`docsage2` comes packed with powerful features designed to streamline your documentation workflow:
+`doscagev2` comes packed with powerful features designed to streamline your documentation workflow:
 
 -   **AI-Powered Document Generation**: Automatically generates `README.md`, `CONTRIBUTING.md`, and `LICENSE` files using Google Gemini AI, analyzing your project's context for accurate and relevant content.
 -   **Comprehensive `README.md`**: Generates detailed `README.md` files including sections for overview, features, architecture diagrams, installation instructions, usage examples, and more.
@@ -70,7 +70,7 @@ Leveraging the advanced capabilities of the Google Gemini AI, `docsage2` analyze
 
 ## Architecture
 
-`docsage2` operates as a CLI tool that orchestrates interactions between the user, the project's file system, and the Google Gemini AI service to produce documentation.
+`doscagev2` operates as a CLI tool that orchestrates interactions between the user, the project's file system, and the Google Gemini AI service to produce documentation.
 
 ```mermaid
 graph TD
@@ -78,8 +78,8 @@ graph TD
         A[User] --> B(CLI Commands & Prompts);
     end
 
-    subgraph DocSage2 Core
-        B --> C{docsage2 CLI};
+    subgraph doscagev2 Core
+        B --> C{doscagev2 CLI};
         C -- Analyzes Project --> D[File System Service];
         D -- Project Structure & Content --> C;
         C -- Requests Generation --> E[Gemini Service];
@@ -107,8 +107,8 @@ graph TD
 ```
 
 **Explanation:**
-1.  **User Interaction**: Developers interact with `docsage2` through a command-line interface, providing commands and responding to prompts.
-2.  **DocSage2 CLI**: The core of the application, built with `commander` and `inquirer`, parses user input and orchestrates the documentation generation process.
+1.  **User Interaction**: Developers interact with `doscagev2` through a command-line interface, providing commands and responding to prompts.
+2.  **doscagev2 CLI**: The core of the application, built with `commander` and `inquirer`, parses user input and orchestrates the documentation generation process.
 3.  **File System Service**: This internal service reads the project's directory structure and the content of key files (`package.json`, `tsconfig.json`, source files) to provide context for the AI.
 4.  **Gemini Service**: Responsible for communicating with the Google Generative AI API. It constructs prompts based on user configurations and project context, sends them to the AI, and receives the generated text.
 5.  **Google Generative AI API**: The external AI model (Gemini) processes the detailed prompts and generates the requested documentation content.
@@ -120,14 +120,14 @@ graph TD
 
 ## Prerequisites
 
-Before using `docsage2`, ensure you have the following installed and configured:
+Before using `doscagev2`, ensure you have the following installed and configured:
 
 -   **Node.js**: Version 18.x or higher. You can download it from [nodejs.org](https://nodejs.org/).
 -   **npm**: Node Package Manager, which comes bundled with Node.js.
 -   **Google Gemini API Key**: You will need an API key for the Google Generative AI.
     1.  Go to the [Google AI Studio](https://aistudio.google.com/).
     2.  Create a new API key.
-    3.  Set this API key as an environment variable named `GEMINI_API_KEY` in your system or in a `.env` file in the project where you run `docsage2`.
+    3.  Set this API key as an environment variable named `GEMINI_API_KEY` in your system or in a `.env` file in the project where you run `doscagev2`.
 
     ```bash
     export GEMINI_API_KEY="YOUR_GEMINI_API_KEY_HERE"
@@ -137,24 +137,24 @@ Before using `docsage2`, ensure you have the following installed and configured:
 
 ## Installation
 
-You can install `docsage2` globally to use it anywhere in your system or as a local project dependency.
+You can install `doscagev2` globally to use it anywhere in your system or as a local project dependency.
 
 ### Global Installation
 
-This is the recommended method for using `docsage2` as a general-purpose tool.
+This is the recommended method for using `doscagev2` as a general-purpose tool.
 
 ```bash
-npm install -g docsage2
+npm install -g doscagev2
 ```
 
 After installation, you can run `docsage` commands directly from any directory.
 
 ### Local Installation
 
-If you prefer to include `docsage2` as a development dependency within a specific project:
+If you prefer to include `doscagev2` as a development dependency within a specific project:
 
 ```bash
-npm install --save-dev docsage2
+npm install --save-dev doscagev2
 ```
 
 To run `docsage` commands locally, you will need to use `npx`:
@@ -167,7 +167,7 @@ npx docsage [command]
 
 ## Usage
 
-`docsage2` is designed to be straightforward to use. Here are some common commands and examples.
+`doscagev2` is designed to be straightforward to use. Here are some common commands and examples.
 
 ### Basic Generation
 
@@ -226,7 +226,7 @@ docsage generate license \
 
 ### Unified Document Generation (Merge Mode)
 
-The `merge` command allows `docsage2` to generate a README that includes full contributing guidelines and license text directly within it, providing a single, comprehensive documentation file.
+The `merge` command allows `doscagev2` to generate a README that includes full contributing guidelines and license text directly within it, providing a single, comprehensive documentation file.
 
 ```bash
 docsage generate readme --merge-docs \
@@ -250,7 +250,7 @@ docsage generate readme --help
 
 ## Configuration
 
-`docsage2` can be configured via command-line flags. Future versions may include support for a configuration file.
+`doscagev2` can be configured via command-line flags. Future versions may include support for a configuration file.
 
 ### Environment Variables
 
@@ -285,15 +285,15 @@ This project is a command-line interface (CLI) tool and does not utilize a datab
 
 ## API Reference
 
-`docsage2` is a CLI application designed for direct developer use and does not expose a public API for other applications to consume programmatically. Its core functionalities are accessed via command-line commands and options.
+`doscagev2` is a CLI application designed for direct developer use and does not expose a public API for other applications to consume programmatically. Its core functionalities are accessed via command-line commands and options.
 
-If you are interested in extending or integrating `docsage2`, you would typically interact with its source code as a Node.js module rather than through a traditional REST or GraphQL API.
+If you are interested in extending or integrating `doscagev2`, you would typically interact with its source code as a Node.js module rather than through a traditional REST or GraphQL API.
 
 ---
 
 ## Tech Stack
 
-`docsage2` is built with a modern and robust set of technologies:
+`doscagev2` is built with a modern and robust set of technologies:
 
 -   **TypeScript**: A superset of JavaScript that adds static typing, enhancing code quality and developer experience.
 -   **Node.js**: A powerful JavaScript runtime environment used for building server-side applications and command-line tools.
@@ -344,7 +344,7 @@ See the [LICENSE](LICENSE) file for more details.
 ```text
 MIT License
 
-Copyright (c) 2024 docsage2
+Copyright (c) 2024 doscagev2
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -369,7 +369,7 @@ SOFTWARE.
 
 ## Roadmap
 
-`docsage2` is under active development, and we have exciting plans for its future. Here's a glimpse of what's on the horizon:
+`doscagev2` is under active development, and we have exciting plans for its future. Here's a glimpse of what's on the horizon:
 
 -   **Support for More Document Types**: Expand generation capabilities to include API documentation, design documents, security policies, and more.
 -   **Advanced Customization Options**: Provide more granular control over generated content, including custom templates and section ordering.
@@ -377,14 +377,14 @@ SOFTWARE.
 -   **Configuration File Support**: Introduce a `docsage.json` or similar configuration file for project-specific default settings.
 -   **Git Integration Enhancements**: Smarter suggestions for `CONTRIBUTING.md` based on existing `.github` templates or commit history.
 -   **Web UI / Desktop Application**: Explore options for a graphical interface to make documentation generation even more accessible.
--   **CI/CD Integration**: Tools and guidelines for integrating `docsage2` into continuous integration/continuous deployment pipelines to ensure documentation stays up-to-date.
+-   **CI/CD Integration**: Tools and guidelines for integrating `doscagev2` into continuous integration/continuous deployment pipelines to ensure documentation stays up-to-date.
 -   **Plugin Architecture**: Allow community-driven extensions for custom document types or integrations.
 
 ---
 
 ## Acknowledgements
 
-We extend our gratitude to the creators and maintainers of the following open-source projects and services that make `docsage2` possible:
+We extend our gratitude to the creators and maintainers of the following open-source projects and services that make `doscagev2` possible:
 
 -   [Google Generative AI](https://ai.google.dev/) for providing the powerful Gemini models.
 -   [Node.js](https://nodejs.org/) for the excellent JavaScript runtime.
@@ -395,4 +395,4 @@ We extend our gratitude to the creators and maintainers of the following open-so
 -   [Mermaid.js](https://mermaid.js.org/) for beautiful diagrams in Markdown.
 -   All other open-source libraries and contributors that form the foundation of this project.
 
-Thank you for being a part of the `docsage2` journey!
+Thank you for being a part of the `doscagev2` journey!

@@ -25,6 +25,14 @@ Your goals:
 
 - **Tone/Style**: Professional yet engaging. Use emojis effectively 🚀.
 
+- **Footer**: At the very end of the README, add this subtle footer (centered, using small dim text):
+  \`\`\`
+  ---
+  <p align="center">
+    <sub>📝 Generated with <a href="https://github.com/Owusu1946/docsagev2">DocSage</a> - AI-powered documentation</sub>
+  </p>
+  \`\`\`
+
 Generate ONLY the Markdown content for the README.md. Do not include introductory text.
 `;
 
