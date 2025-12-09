@@ -354,4 +354,5 @@ We extend our sincere gratitude to:
 *   **The Open-Source Community**: For the invaluable libraries and tools (Node.js, TypeScript, Commander.js, Inquirer.js, etc.) that make this project possible.
 *   **Contributors**: To everyone who has contributed ideas, bug reports, or code.
 *   **Users**: For trying out DocsAge 2 and providing feedback!#   d o c s a g e v 2  
+ #   d o c s a g e v 2  
  
