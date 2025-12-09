@@ -1,0 +1,37 @@
+{
+  "name": "docsage2",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "type": "module",
+  "bin": {
+    "docsage": "./dist/bin/cli.js"
+  },
+  "devDependencies": {
+    "@types/figlet": "^1.7.0",
+    "@types/glob": "^9.0.0",
+    "@types/gradient-string": "^1.1.6",
+    "@types/inquirer": "^9.0.9"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "boxen": "^8.0.1",
+    "chalk": "^5.6.2",
+    "commander": "^14.0.2",
+    "dotenv": "^17.2.3",
+    "figlet": "^1.9.4",
+    "glob": "^13.0.0",
+    "gradient-string": "^3.0.0",
+    "inquirer": "^13.0.2",
+    "ora": "^9.0.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  }
+}
