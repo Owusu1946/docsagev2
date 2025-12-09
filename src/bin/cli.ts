@@ -91,18 +91,30 @@ const resetApiKey = async (): Promise<void> => {
     console.log(chalk.green('✓ API key removed. You will be prompted for a new key next time.\n'));
 };
 
-const openDiffInEditor = (originalPath: string, newPath: string): void => {
+const openDiffInEditor = async (originalPath: string, newPath: string): Promise<boolean> => {
     try {
+        // Verify the new file exists before trying to open diff
+        await fs.access(newPath);
+
         // Use spawn with detached to prevent blocking terminal stdin
-        const child = spawn('code', ['--diff', originalPath, newPath], {
+        // Quote paths to handle spaces in directory names
+        const child = spawn('code', ['--diff', `"${originalPath}"`, `"${newPath}"`], {
             detached: true,
             stdio: 'ignore',
             shell: true
         });
         child.unref();
+
+        // Give VS Code a moment to read the file
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
         console.log(chalk.cyan('\n📝 Diff opened in VS Code editor. Review the changes there.\n'));
+        return true;
     } catch (error) {
-        console.log(chalk.yellow('\n⚠️ Could not open VS Code. Make sure "code" is in your PATH.\n'));
+        console.log(chalk.yellow('\n⚠️ Could not open VS Code diff. Make sure "code" is in your PATH.\n'));
+        console.log(chalk.dim(`Original: ${originalPath}`));
+        console.log(chalk.dim(`New: ${newPath}\n`));
+        return false;
     }
 };
 
@@ -120,8 +132,11 @@ const writeToFile = async (filename: string, content: string) => {
         const tempFilePath = path.join(tempDir, `${filename}.new`);
         await fs.writeFile(tempFilePath, content, 'utf-8');
 
-        // Open diff in editor
-        openDiffInEditor(filePath, tempFilePath);
+        // Small delay to ensure file is flushed to disk
+        await new Promise(resolve => setTimeout(resolve, 200));
+
+        // Open diff in editor (now async)
+        const diffOpened = await openDiffInEditor(filePath, tempFilePath);
 
         // Small delay to let terminal stabilize after spawning VS Code
         await new Promise(resolve => setTimeout(resolve, 500));
