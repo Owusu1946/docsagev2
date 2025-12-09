@@ -5,6 +5,7 @@ import chalk from 'chalk';
 import ora from 'ora';
 import fs from 'fs/promises';
 import path from 'path';
+import os from 'os';
 import figlet from 'figlet';
 import gradient from 'gradient-string';
 import { spawn } from 'child_process';
@@ -16,6 +17,28 @@ dotenv.config();
 
 const program = new Command();
 
+// Config file path in user's home directory
+const CONFIG_DIR = path.join(os.homedir(), '.docsage');
+const CONFIG_FILE = path.join(CONFIG_DIR, 'config.json');
+
+interface DocsageConfig {
+    apiKey?: string;
+}
+
+const loadConfig = async (): Promise<DocsageConfig> => {
+    try {
+        const data = await fs.readFile(CONFIG_FILE, 'utf-8');
+        return JSON.parse(data);
+    } catch (e) {
+        return {};
+    }
+};
+
+const saveConfig = async (config: DocsageConfig): Promise<void> => {
+    await fs.mkdir(CONFIG_DIR, { recursive: true });
+    await fs.writeFile(CONFIG_FILE, JSON.stringify(config, null, 2), 'utf-8');
+};
+
 const displayTitle = () => {
     const title = figlet.textSync('DocSage', { font: 'Slant' });
     console.log(gradient.pastel.multiline(title));
@@ -23,18 +46,49 @@ const displayTitle = () => {
 };
 
 const getApiKey = async (): Promise<string> => {
+    // Priority: 1. Environment variable, 2. Stored config, 3. Prompt user
     if (process.env.GEMINI_API_KEY) {
         return process.env.GEMINI_API_KEY;
     }
+
+    const config = await loadConfig();
+    if (config.apiKey) {
+        console.log(chalk.dim('Using saved API key. Run "docsage config --reset" to change it.\n'));
+        return config.apiKey;
+    }
+
     const { apiKey } = await inquirer.prompt([
         {
             type: 'password',
             name: 'apiKey',
             message: 'Enter your Google Gemini API Key:',
-            validate: (input) => input.length > 0 || 'API Key is required/or set GEMINI_API_KEY in .env',
+            validate: (input) => input.length > 0 || 'API Key is required',
         },
     ]);
+
+    // Ask if user wants to save the key
+    const { saveKey } = await inquirer.prompt([
+        {
+            type: 'confirm',
+            name: 'saveKey',
+            message: 'Save API key locally for future use?',
+            default: true,
+        },
+    ]);
+
+    if (saveKey) {
+        await saveConfig({ ...config, apiKey });
+        console.log(chalk.green('✓ API key saved to ~/.docsage/config.json\n'));
+    }
+
     return apiKey;
+};
+
+const resetApiKey = async (): Promise<void> => {
+    const config = await loadConfig();
+    delete config.apiKey;
+    await saveConfig(config);
+    console.log(chalk.green('✓ API key removed. You will be prompted for a new key next time.\n'));
 };
 
 const openDiffInEditor = (originalPath: string, newPath: string): void => {
@@ -353,8 +407,35 @@ const main = async () => {
     }
 };
 
-main().catch((err) => {
-    logger.error(err);
-    process.exit(1);
-});
-
+// Check for config command first
+const args = process.argv.slice(2);
+if (args[0] === 'config') {
+    if (args.includes('--reset') || args.includes('-r')) {
+        displayTitle();
+        resetApiKey().then(() => process.exit(0));
+    } else if (args.includes('--show') || args.includes('-s')) {
+        displayTitle();
+        loadConfig().then(config => {
+            if (config.apiKey) {
+                const masked = config.apiKey.slice(0, 6) + '...' + config.apiKey.slice(-4);
+                console.log(chalk.cyan(`Saved API Key: ${masked}`));
+                console.log(chalk.dim(`Config location: ${CONFIG_FILE}`));
+            } else {
+                console.log(chalk.yellow('No API key saved. Run docsage to set one.'));
+            }
+            process.exit(0);
+        });
+    } else {
+        displayTitle();
+        console.log(chalk.bold('DocSage Configuration\n'));
+        console.log('  docsage config --show    Show saved API key (masked)');
+        console.log('  docsage config --reset   Remove saved API key');
+        console.log(`\nConfig file: ${CONFIG_FILE}`);
+        process.exit(0);
+    }
+} else {
+    main().catch((err) => {
+        logger.error(err);
+        process.exit(1);
+    });
+}
