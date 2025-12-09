@@ -1,398 +1,352 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/Owusu1946/docsagev2/main/src/assets/docsage-logo.png" alt="docsagev2 Logo" width="150"/>
+  <img src="src/assets/docsage-logo.png" alt="DocSage Logo" width="150"/>
 </p>
 
-<h1 align="center">docsagev2</h1>
+<h1 align="center">DocSage v2 📝✨</h1>
 
 <p align="center">
-  <b>🚀 Your AI-Powered Documentation Co-pilot for Rapid Project Documentation Generation! 🚀</b>
+  <strong>An AI-powered CLI tool that automatically generates professional README.md, CONTRIBUTING.md, and LICENSE files using Google Gemini AI.</strong>
 </p>
 
 <p align="center">
   <!-- Version Badge -->
-  <a href="https://www.npmjs.com/package/docsagev2" target="_blank">
-    <img src="https://img.shields.io/npm/v/docsagev2?style=flat-square&color=blue" alt="npm version">
+  <a href="https://www.npmjs.com/package/docsagev2">
+    <img src="https://img.shields.io/npm/v/docsagev2?style=for-the-badge&logo=npm&color=CB3837" alt="npm version">
   </a>
   <!-- License Badge -->
-  <a href="https://github.com/Owusu1946/docsagev2/blob/main/LICENSE" target="_blank">
-    <img src="https://img.shields.io/github/license/docsage/docsagev2?style=flat-square&color=green" alt="License">
+  <a href="./LICENSE">
+    <img src="https://img.shields.io/badge/License-ISC-blue.svg?style=for-the-badge" alt="License: ISC">
   </a>
-  <!-- Tech Stack Badges -->
-  <img src="https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white" alt="TypeScript">
-  <img src="https://img.shields.io/badge/Node.js-339933?style=flat-square&logo=node.js&logoColor=white" alt="Node.js">
-  <img src="https://img.shields.io/badge/Google_Gemini-FF6F00?style=flat-square&logo=google&logoColor=white" alt="Google Gemini">
-  <img src="https://img.shields.io/badge/CLI-black?style=flat-square&logo=cli&logoColor=white" alt="CLI Tool">
+  <!-- TypeScript Badge -->
+  <img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript">
+  <!-- Node.js Badge -->
+  <img src="https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white" alt="Node.js">
+  <!-- Google Gemini AI Badge -->
+  <img src="https://img.shields.io/badge/Google%20Gemini%20AI-007BFF?style=for-the-badge&logo=google&logoColor=white" alt="Google Gemini AI">
+  <!-- GitHub Repo Size -->
+  <img src="https://img.shields.io/github/repo-size/Owusu1946/docsagev2?style=for-the-badge&label=Repo%20Size&color=green" alt="Repo Size">
 </p>
 
 ---
 
-## Table of Contents
+## 📖 Table of Contents
 
-- [Overview](#overview)
-- [Features](#features)
-- [Architecture](#architecture)
-- [Prerequisites](#prerequisites)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Configuration](#configuration)
-- [Database Schema](#database-schema)
-- [API Reference](#api-reference)
-- [Tech Stack](#tech-stack)
-- [Contributing](#contributing)
-- [License](#license)
-- [Roadmap](#roadmap)
-- [Acknowledgements](#acknowledgements)
-
----
-
-## Overview
-
-In the fast-paced world of software development, maintaining up-to-date and comprehensive documentation often becomes an afterthought, leading to knowledge gaps, slowed onboarding, and increased technical debt. `docsagev2` addresses this critical challenge by providing an intelligent, AI-powered command-line interface (CLI) tool that automates the generation of various project documentation files.
-
-Leveraging the advanced capabilities of the Google Gemini AI, `docsagev2` analyzes your project's structure, key files, and dependencies to craft professional `README.md`, `CONTRIBUTING.md`, and `LICENSE` files with minimal effort. This tool empowers developers to focus on coding while ensuring their projects are well-documented, promoting better collaboration and project longevity.
+*   [🌟 Overview](#-overview)
+*   [🚀 Features](#-features)
+*   [🏗️ Architecture](#️-architecture)
+*   [⚙️ Prerequisites](#️-prerequisites)
+*   [🛠️ Installation](#️-installation)
+*   [💡 Usage](#-usage)
+*   [🔧 Configuration](#-configuration)
+*   [📊 Database Schema](#-database-schema)
+*   [🖥️ API Reference](#️-api-reference)
+*   [tech Stack](#tech-stack)
+*   [🤝 Contributing](#-contributing)
+*   [📜 License](#-license)
+*   [🗺️ Roadmap](#️-roadmap)
+*   [🙏 Acknowledgements](#-acknowledgements)
 
 ---
 
-## Features
+## 🌟 Overview
 
-`docsagev2` comes packed with powerful features designed to streamline your documentation workflow:
+`docsagev2` is a powerful and intuitive Command Line Interface (CLI) tool designed to streamline the documentation process for software projects. Leveraging the advanced capabilities of Google Gemini AI, it automatically generates high-quality, professional `README.md`, `CONTRIBUTING.md`, and `LICENSE` files. This tool solves the common pain point of developers spending valuable time on boilerplate documentation, ensuring consistency, accuracy, and best practices across projects. With `docsagev2`, you can kickstart your project with robust documentation in seconds, allowing you to focus on coding.
 
--   **AI-Powered Document Generation**: Automatically generates `README.md`, `CONTRIBUTING.md`, and `LICENSE` files using Google Gemini AI, analyzing your project's context for accurate and relevant content.
--   **Comprehensive `README.md`**: Generates detailed `README.md` files including sections for overview, features, architecture diagrams, installation instructions, usage examples, and more.
--   **Streamlined `CONTRIBUTING.md`**: Creates professional `CONTRIBUTING.md` guidelines covering bug reports, feature requests, development setup, code style, and pull request processes.
--   **Automated License Creation**: Generates complete and accurate license texts (e.g., MIT, Apache 2.0) with configurable copyright details.
--   **Customizable Output**: Supports various configuration options to tailor the generated content, including specific sections, diagram inclusion, and stylistic choices.
--   **Mermaid Diagram Support**: Automatically embeds Mermaid.js syntax for architecture diagrams and contributing workflow diagrams directly into your Markdown files.
--   **Interactive CLI**: Utilizes `commander` and `inquirer` for an intuitive and user-friendly command-line experience.
--   **TypeScript-First**: Developed in TypeScript for robust, maintainable, and scalable code.
+## 🚀 Features
 
----
+`docsagev2` offers a comprehensive set of features to automate and enhance your project's documentation:
 
-## Architecture
+*   **AI-Powered Content Generation**: Utilizes Google Gemini AI for intelligent and context-aware document generation.
+*   **README.md Generation**: Automatically creates a professional and comprehensive `README.md` file, including sections like Overview, Features, Architecture diagrams (Mermaid), Installation, Usage, and more.
+*   **CONTRIBUTING.md Generation**: Generates detailed `CONTRIBUTING.md` guidelines, covering bug reporting, feature requests, development setup, code style, and pull request workflows.
+*   **LICENSE File Generation**: Easily generates various types of license files (e.g., MIT, ISC) with correct copyright information.
+*   **Project Structure Analysis**: Intelligently analyzes your project's file structure and key file contents (`package.json`, `tsconfig.json`, etc.) to tailor the generated documentation.
+*   **Customizable Output**: Supports various configuration options for styling, included sections, diagram types, and more, providing flexible documentation tailored to your needs.
+*   **Mermaid Diagram Support**: Seamlessly integrates Mermaid.js syntax for generating architecture, ERD, and contributing flow diagrams directly within your Markdown files.
+*   **Developer-Friendly CLI**: An easy-to-use command-line interface built with `Commander.js` and `Inquirer.js` for an interactive experience.
+*   **TypeScript-First**: Developed entirely in TypeScript for robust, scalable, and maintainable code.
 
-`docsagev2` operates as a CLI tool that orchestrates interactions between the user, the project's file system, and the Google Gemini AI service to produce documentation.
+## 🏗️ Architecture
+
+The `docsagev2` CLI operates by orchestrating several key components to generate documentation. At its core, it interacts with the Google Gemini AI model, providing project context and specific prompts to produce desired output.
 
 ```mermaid
 graph TD
-    subgraph User Interaction
-        A[User] --> B(CLI Commands & Prompts);
-    end
+    A[User] -- "Run docsage CLI command" --> B(CLI - src/bin/cli.ts);
 
-    subgraph docsagev2 Core
-        B --> C{docsagev2 CLI};
-        C -- Analyzes Project --> D[File System Service];
-        D -- Project Structure & Content --> C;
-        C -- Requests Generation --> E[Gemini Service];
-        E -- Transforms Response --> G[Markdown Renderer];
-    end
+    B -- "Read project structure & key files" --> C(File System Service - src/services/file-system.ts);
+    C -- "Provide file content & structure" --> D(Gemini Service - src/services/gemini.ts);
 
-    subgraph AI Layer
-        E -- API Calls (Project Context, Prompts) --> F[Google Generative AI API];
-        F -- Generated Text --> E;
-    end
+    B -- "Generate Prompts & Options" --> D;
 
-    subgraph Output
-        G -- Formatted Docs --> H[Generated Documentation Files];
-        H --> I[Project Directory];
-    end
+    D -- "Call Google Gemini API" --> E[Google Gemini AI Model];
+    E -- "Return Generated Text" --> D;
 
-    style A fill:#f9f,stroke:#333,stroke-width:2px
-    style C fill:#bbf,stroke:#333,stroke-width:2px
-    style D fill:#ddf,stroke:#333,stroke-width:2px
-    style E fill:#fdd,stroke:#333,stroke-width:2px
-    style F fill:#dfd,stroke:#333,stroke-width:2px
-    style G fill:#ccf,stroke:#333,stroke-width:2px
-    style H fill:#fff,stroke:#333,stroke-width:2px
-    style I fill:#eee,stroke:#333,stroke-width:2px
+    D -- "Return Generated Document" --> B;
+    B -- "Write to File System (README.md, CONTRIBUTING.md, LICENSE)" --> F[Project Output Files];
+
+    style A fill:#f9f,stroke:#333,stroke-width:2px;
+    style E fill:#ADD8E6,stroke:#333,stroke-width:2px;
+    style F fill:#FFFACD,stroke:#333,stroke-width:2px;
 ```
 
-**Explanation:**
-1.  **User Interaction**: Developers interact with `docsagev2` through a command-line interface, providing commands and responding to prompts.
-2.  **docsagev2 CLI**: The core of the application, built with `commander` and `inquirer`, parses user input and orchestrates the documentation generation process.
-3.  **File System Service**: This internal service reads the project's directory structure and the content of key files (`package.json`, `tsconfig.json`, source files) to provide context for the AI.
-4.  **Gemini Service**: Responsible for communicating with the Google Generative AI API. It constructs prompts based on user configurations and project context, sends them to the AI, and receives the generated text.
-5.  **Google Generative AI API**: The external AI model (Gemini) processes the detailed prompts and generates the requested documentation content.
-6.  **Markdown Renderer**: Processes the raw text from the Gemini service, ensuring proper Markdown formatting, embedding diagrams, and structuring the output.
-7.  **Generated Documentation Files**: The final `README.md`, `CONTRIBUTING.md`, or `LICENSE` files are created.
-8.  **Project Directory**: The generated documentation files are written back into the user's project directory.
+**Component Breakdown:**
 
----
+*   **CLI (`src/bin/cli.ts`)**: The entry point for `docsagev2`. It handles user input, parses commands and options, and orchestrates the documentation generation process by calling the `GeminiService`.
+*   **File System Service (`src/services/file-system.ts`)**: Responsible for interacting with the local file system. It reads project structure, identifies key files, and extracts their content, providing crucial context for the AI.
+*   **Gemini Service (`src/services/gemini.ts`)**: The core AI integration layer. It constructs prompts based on user options and project context, sends requests to the Google Gemini API, and processes the AI's responses.
+*   **Google Gemini AI Model**: The external AI service that performs the actual text generation, leveraging its large language model capabilities to produce coherent and relevant documentation.
+*   **Project Output Files**: The final generated `README.md`, `CONTRIBUTING.md`, and `LICENSE` files written back to the user's project directory.
 
-## Prerequisites
+## ⚙️ Prerequisites
 
-Before using `docsagev2`, ensure you have the following installed and configured:
+Before you can use `docsagev2`, ensure you have the following installed:
 
--   **Node.js**: Version 18.x or higher. You can download it from [nodejs.org](https://nodejs.org/).
--   **npm**: Node Package Manager, which comes bundled with Node.js.
--   **Google Gemini API Key**: You will need an API key for the Google Generative AI.
-    1.  Go to the [Google AI Studio](https://aistudio.google.com/).
-    2.  Create a new API key.
-    3.  Set this API key as an environment variable named `GEMINI_API_KEY` in your system or in a `.env` file in the project where you run `docsagev2`.
+*   **Node.js**: Version 18.x or higher. You can download it from [nodejs.org](https://nodejs.org/).
+*   **npm** (Node Package Manager) or **Yarn**: Usually comes bundled with Node.js.
+*   **Google Gemini API Key**: `docsagev2` requires access to the Google Gemini API. You will need to obtain an API key from the [Google AI Studio](https://makersuite.google.com/app/apikey).
+
+## 🛠️ Installation
+
+Follow these steps to get `docsagev2` up and running on your system:
+
+1.  **Install `docsagev2` globally**:
 
     ```bash
-    export GEMINI_API_KEY="YOUR_GEMINI_API_KEY_HERE"
+    npm install -g docsagev2
+    # OR
+    yarn global add docsagev2
     ```
 
----
+2.  **Set up your Google Gemini API Key**:
+    `docsagev2` expects your API key to be available as an environment variable named `GEMINI_API_KEY`.
 
-## Installation
+    *   **For Linux/macOS**: Add the following line to your `~/.bashrc`, `~/.zshrc`, or `~/.profile` file:
 
-You can install `docsagev2` globally to use it anywhere in your system or as a local project dependency.
+        ```bash
+        export GEMINI_API_KEY="YOUR_GEMINI_API_KEY"
+        ```
 
-### Global Installation
+        Then, reload your shell configuration:
+        ```bash
+        source ~/.bashrc # or ~/.zshrc, ~/.profile
+        ```
 
-This is the recommended method for using `docsagev2` as a general-purpose tool.
+    *   **For Windows (Command Prompt)**:
 
-```bash
-npm install -g docsagev2
-```
+        ```cmd
+        setx GEMINI_API_KEY "YOUR_GEMINI_API_KEY"
+        ```
 
-After installation, you can run `docsage` commands directly from any directory.
+        You will need to open a new command prompt window for the variable to take effect.
 
-### Local Installation
+    *   **For Windows (PowerShell)**:
 
-If you prefer to include `docsagev2` as a development dependency within a specific project:
+        ```powershell
+        [System.Environment]::SetEnvironmentVariable('GEMINI_API_KEY', 'YOUR_GEMINI_API_KEY', 'User')
+        ```
 
-```bash
-npm install --save-dev docsagev2
-```
+        Restart your PowerShell session for the variable to take effect.
 
-To run `docsage` commands locally, you will need to use `npx`:
+    Replace `YOUR_GEMINI_API_KEY` with the actual API key you obtained from Google AI Studio.
 
-```bash
-npx docsage [command]
-```
+## 💡 Usage
 
----
+Navigate to your project's root directory in your terminal and run `docsage` to generate your documentation.
 
-## Usage
+### Basic Usage
 
-`docsagev2` is designed to be straightforward to use. Here are some common commands and examples.
-
-### Basic Generation
-
-To get started, navigate to your project's root directory and run the `init` command, which will guide you through generating essential documentation.
-
-```bash
-docsage init
-```
-
-Alternatively, you can generate specific documents:
-
-### Generate `README.md`
+To generate a README.md with default settings:
 
 ```bash
-docsage generate readme [options]
+docsage readme
 ```
 
-**Example:** Generate a README with specific sections and diagrams.
+### Generating All Document Types
+
+You can use the `--all` option to generate `README.md`, `CONTRIBUTING.md`, and `LICENSE` files at once:
 
 ```bash
-docsage generate readme \
-  --sections "Overview,Features,Architecture,Installation,Usage,Tech Stack,Contributing,License" \
-  --include-architecture-diagram \
-  --include-contributing-diagram \
-  --style Professional
+docsage --all
 ```
 
-### Generate `CONTRIBUTING.md`
+This command will prompt you for additional options, such as the license type.
+
+### Generating Specific Documents
+
+*   **README.md**:
+    ```bash
+    docsage readme --style Professional --badges --arch --erd --contrib-flow
+    ```
+    *   `--style <style>`: Specify the tone (e.g., `Professional`, `Informative`, `Concise`).
+    *   `--badges`: Include Shields.io badges.
+    *   `--arch`: Include a Mermaid architecture diagram.
+    *   `--erd`: Include a Mermaid ERD diagram (if applicable).
+    *   `--contrib-flow`: Include a Mermaid contributing flow diagram.
+    *   `--sections <section1,section2>`: Specify particular sections to include (e.g., `Overview,Features`).
+
+*   **CONTRIBUTING.md**:
+    ```bash
+    docsage contributing --coc ContributorCovenant
+    ```
+    *   `--coc <type>`: Specify the Code of Conduct (e.g., `ContributorCovenant`, `None`).
+    *   `--templates`: Include issue/PR templates as examples.
+
+*   **LICENSE**:
+    ```bash
+    docsage license --type MIT --author "Your Name"
+    ```
+    *   `--type <license>`: Specify the license type (e.g., `MIT`, `ISC`, `Apache-2.0`).
+    *   `--author <name>`: Specify the copyright holder.
+
+### Merged Documentation Output
+
+You can generate all documents (README, Contributing, License) merged into a single `README.md` file using the `--merge` option. This is useful for projects that prefer to keep all primary documentation in one place.
 
 ```bash
-docsage generate contributing [options]
+docsage --merge --type MIT --author "Owusu1946"
 ```
 
-**Example:** Generate a CONTRIBUTING.md with a specific Code of Conduct.
+This will generate a `README.md` that includes detailed contributing guidelines and the full license text within its respective sections.
 
-```bash
-docsage generate contributing \
-  --code-of-conduct "Contributor Covenant" \
-  --include-templates
-```
-
-### Generate `LICENSE`
-
-```bash
-docsage generate license [options]
-```
-
-**Example:** Generate an MIT license with specific author details.
-
-```bash
-bash
-docsage generate license \
-  --type "MIT" \
-  --author "Your Name or Organization"
-```
-
-### Unified Document Generation (Merge Mode)
-
-The `merge` command allows `docsagev2` to generate a README that includes full contributing guidelines and license text directly within it, providing a single, comprehensive documentation file.
-
-```bash
-docsage generate readme --merge-docs \
-  --license-type "MIT" \
-  --author "Your Name" \
-  --include-architecture-diagram \
-  --include-contributing-diagram
-```
-
-### Help
-
-To see all available commands and options:
+For a full list of commands and options, run:
 
 ```bash
 docsage --help
-# Or for a specific command:
-docsage generate readme --help
 ```
 
----
+## 🔧 Configuration
 
-## Configuration
+`docsagev2` is primarily configured via command-line options.
 
-`docsagev2` can be configured via command-line flags. Future versions may include support for a configuration file.
+*   **`GEMINI_API_KEY`**: This environment variable is mandatory for the tool to authenticate with the Google Gemini API.
+*   **CLI Options**: Each command (`readme`, `contributing`, `license`) accepts various flags to customize the output. Refer to the `Usage` section or run `docsage <command> --help` for details.
 
-### Environment Variables
+### Example Configuration Options
 
--   `GEMINI_API_KEY`: Your Google Gemini API key. **Required**.
+| Option             | Command     | Description                                                          | Example Value                     |
+| :----------------- | :---------- | :------------------------------------------------------------------- | :-------------------------------- |
+| `--style`          | `readme`    | Tone of writing for the README.                                      | `Professional`, `Informative`     |
+| `--badges`         | `readme`    | Include Shields.io badges.                                           | `true` / `false`                  |
+| `--arch`           | `readme`    | Include Mermaid Architecture diagram.                                | `true` / `false`                  |
+| `--erd`            | `readme`    | Include Mermaid ERD diagram (if applicable).                         | `true` / `false`                  |
+| `--contrib-flow`   | `readme`    | Include Mermaid Contributing Flow diagram.                           | `true` / `false`                  |
+| `--sections`       | `readme`    | Comma-separated list of specific sections to include.                | `Overview,Installation,Tech Stack`|
+| `--coc`            | `contributing`| Specify Code of Conduct type.                                        | `Contributor Covenant`, `None`    |
+| `--templates`      | `contributing`| Include example issue/PR templates.                                  | `true` / `false`                  |
+| `--type`           | `license`   | Specify the license type.                                            | `MIT`, `ISC`, `Apache-2.0`        |
+| `--author`         | `license`   | Copyright holder for the license.                                    | `"John Doe"`                      |
+| `--merge`          | `all`       | Generate all docs into a single README (includes full contributing & license). | `true` / `false`                  |
 
-### Command-line Options
+## 📊 Database Schema
 
-The `docsage generate` command and its subcommands (e.g., `readme`, `contributing`, `license`) accept various flags:
+This project is a CLI tool and does not utilize a traditional database. Therefore, a database schema is not applicable.
 
-| Option                    | Description                                                                 | Default      | Applicable To                 |
-| :------------------------ | :-------------------------------------------------------------------------- | :----------- | :---------------------------- |
-| `--style <style>`         | Adopt a specific writing style/tone (e.g., `Professional`, `Concise`).      | `Professional` | `readme`, `contributing`      |
-| `--include-badges`        | Include Shields.io badges in the generated README.                          | `true`       | `readme`                      |
-| `--sections <list>`       | Comma-separated list of sections to include in the README.                  | `All`        | `readme`                      |
-| `--include-architecture-diagram` | Embed a Mermaid.js architecture diagram.                                    | `false`      | `readme`                      |
-| `--include-erd`           | Embed a Mermaid.js ERD (if applicable to project).                          | `false`      | `readme`                      |
-| `--include-contributing-diagram` | Embed a Mermaid.js contributing flow diagram.                               | `false`      | `readme`                      |
-| `--merge-docs`            | Merge contributing guidelines and license text directly into README.md.     | `false`      | `readme`                      |
-| `--license-type <type>`   | Specify the license type (e.g., `MIT`, `Apache 2.0`).                       | `MIT`        | `readme` (with `--merge-docs`), `license` |
-| `--author <name>`         | Copyright holder for the license.                                           | `The Maintainers` | `readme` (with `--merge-docs`), `license` |
-| `--code-of-conduct <type>`| Type of Code of Conduct to reference/include (e.g., `Contributor Covenant`). | `None`       | `contributing`                |
-| `--include-templates`     | Include example issue/PR templates in the CONTRIBUTING.md.                  | `false`      | `contributing`                |
-| `--output <path>`         | Specify the output file path.                                               | Current dir  | All                           |
+```mermaid
+erDiagram
+    %% Not applicable for this CLI tool, as it does not utilize a database.
+    %% This section is included to adhere to the requested structure.
+```
 
----
+## 🖥️ API Reference
 
-## Database Schema
+`docsagev2` is primarily a CLI tool and does not expose a public programmatic API for external applications to consume directly. Its "API" is its set of command-line interfaces.
 
-This project is a command-line interface (CLI) tool and does not utilize a database. Therefore, a database schema is not applicable. Its primary function is to interact with the file system and external AI services.
+### CLI Commands
 
----
+The main entry point for `docsagev2` is the `docsage` command, which supports the following subcommands:
 
-## API Reference
-
-`docsagev2` is a CLI application designed for direct developer use and does not expose a public API for other applications to consume programmatically. Its core functionalities are accessed via command-line commands and options.
-
-If you are interested in extending or integrating `docsagev2`, you would typically interact with its source code as a Node.js module rather than through a traditional REST or GraphQL API.
-
----
+| Command           | Description                                                                                                                                                                                                            | Options (e.g., `docsage <command> --help`)                                                                             |
+| :---------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------- |
+| `docsage readme`  | Generates a `README.md` file for the current project. This is the primary command for project overview and setup documentation.                                                                                       | `--style`, `--badges`, `--arch`, `--erd`, `--contrib-flow`, `--sections`                                           |
+| `docsage contributing` | Generates a `CONTRIBUTING.md` file, providing guidelines for how others can contribute to your project.                                                                                                                | `--coc`, `--templates`                                                                                                 |
+| `docsage license` | Generates a `LICENSE` file based on a specified open-source license type.                                                                                                                                             | `--type`, `--author`                                                                                                   |
+| `docsage --all`   | An interactive shortcut to generate `README.md`, `CONTRIBUTING.md`, and `LICENSE` files sequentially, prompting for necessary options.                                                                                | `--merge`, `--type`, `--author` (for License options when `--all` is used)                                            |
+| `docsage --merge` | Generates a single `README.md` file that includes detailed contributing guidelines and the full license text within its sections.                                                                                   | `--type`, `--author`, `--style`, `--badges`, `--arch`, `--erd`, `--contrib-flow`, `--sections`                         |
+| `docsage --help`  | Displays general help information, including available commands and global options.                                                                                                                                    | N/A                                                                                                                    |
+| `docsage <command> --help` | Displays detailed help for a specific subcommand, listing its specific options.                                                                                                                                | N/A                                                                                                                    |
 
 ## Tech Stack
 
-`docsagev2` is built with a modern and robust set of technologies:
+`docsagev2` is built with a modern and robust tech stack to deliver a seamless and efficient experience:
 
--   **TypeScript**: A superset of JavaScript that adds static typing, enhancing code quality and developer experience.
--   **Node.js**: A powerful JavaScript runtime environment used for building server-side applications and command-line tools.
--   **Google Generative AI**: The underlying artificial intelligence model (Gemini) that powers the documentation generation.
--   **Commander.js**: A robust library for building command-line interfaces, simplifying argument parsing and command definition.
--   **Inquirer.js**: Provides an elegant way to create interactive command-line prompts, making the CLI user-friendly.
--   **Chalk**: A library for styling terminal output with colors and styles, improving readability and user experience.
--   **Boxen**: Creates customizable boxes in the terminal, often used for displaying stylized messages or banners.
--   **Figlet**: Generates ASCII art banners, commonly used for welcome messages in CLIs.
--   **Gradient-String**: Adds gradient colors to terminal strings for eye-catching output.
--   **Ora**: A tiny library for elegant terminal spinners, providing visual feedback during long-running operations.
--   **Dotenv**: Loads environment variables from a `.env` file, crucial for managing API keys and configuration.
--   **Glob**: For matching file paths with patterns, essential for analyzing project structure.
--   **Diff**: A library to generate and apply diffs, potentially used for comparing generated docs or showing changes.
+*   **Programming Language**:
+    *   [TypeScript](https://www.typescriptlang.org/): A strongly typed superset of JavaScript that compiles to plain JavaScript. Enhances code quality and maintainability.
+*   **Runtime Environment**:
+    *   [Node.js](https://nodejs.org/): A JavaScript runtime built on Chrome's V8 JavaScript engine.
+*   **AI Integration**:
+    *   [@google/generative-ai](https://github.com/google/generative-ai-js): Official JavaScript SDK for interacting with Google Gemini AI.
+*   **CLI Frameworks**:
+    *   [Commander.js](https://github.com/tj/commander.js): A robust command-line interface framework for Node.js.
+    *   [Inquirer.js](https://github.com/SBoudrias/Inquirer.js): A collection of common interactive command-line user interfaces.
+*   **Utilities & Enhancements**:
+    *   [Chalk](https://github.com/chalk/chalk): Terminal string styling done right.
+    *   [Ora](https://github.com/sindresorhus/ora): Elegant terminal spinner.
+    *   [Dotenv](https://github.com/motdotla/dotenv): Loads environment variables from a `.env` file.
+    *   [Figlet](https://github.com/patorjk/figlet.js/): Creates ASCII art from text.
+    *   [Glob](https://github.com/isaacs/node-glob): Find files matching patterns.
+    *   [Diff](https://github.com/kpdecker/jsdiff): A JavaScript text diffing library.
+    *   [Boxen](https://github.com/sindresorhus/boxen): Create boxes in the terminal.
+    *   [Gradient-String](https://github.com/sindresorhus/gradient-string): Apply beautiful gradients to terminal strings.
 
----
+## 🤝 Contributing
 
-## Contributing
+We welcome contributions to `docsagev2`! Whether it's bug reports, feature requests, or code contributions, your help is greatly appreciated.
 
-We welcome contributions from the community! Whether it's bug reports, feature requests, or code contributions, your help is invaluable. Please refer to our `CONTRIBUTING.md` file for detailed guidelines on how to get started.
+Please refer to our dedicated [CONTRIBUTING.md](CONTRIBUTING.md) file for detailed guidelines on how to get involved.
 
 ```mermaid
-sequenceDiagram
-    actor Developer
-    participant GitHub
-    participant ProjectMaintainers
-    Developer->>GitHub: Forks repository
-    Developer->>Developer: Clones fork & creates feature branch
-    Developer->>Developer: Implements new feature or bugfix
-    Developer->>GitHub: Pushes feature branch to fork
-    Developer->>GitHub: Opens Pull Request (PR)
-    GitHub->>ProjectMaintainers: Notifies of new PR
-    ProjectMaintainers->>Developer: Reviews code, suggests changes (optional)
-    Developer->>Developer: Addresses feedback & pushes updates
-    ProjectMaintainers->>GitHub: Approves PR
-    GitHub->>GitHub: Merges PR into 'main' branch
-    ProjectMaintainers->>Developer: Thanks for contributing! 🎉
+gitGraph
+    commit
+    commit id: "Initial commit"
+    branch develop
+    checkout develop
+    commit id: "Feature A initial"
+    branch feature/add-readme-options
+    checkout feature/add-readme-options
+    commit id: "Implement --arch option"
+    commit id: "Add --erd option"
+    checkout develop
+    merge feature/add-readme-options tag: "v1.1.0"
+    commit id: "Bugfix for file reading"
+    branch feature/unified-docs
+    checkout feature/unified-docs
+    commit id: "Develop --merge logic"
+    commit id: "Integrate license text"
+    checkout develop
+    merge feature/unified-docs tag: "v1.2.0"
+    branch main
+    checkout main
+    merge develop id: "Release v1.2.0"
+    commit id: "Prepare for v1.3.0"
 ```
 
----
+## 📜 License
 
-## License
+This project is licensed under the **ISC License**.
 
-This project is licensed under the **MIT License**.
+You are free to use, modify, and distribute this software under the terms of the ISC License. For the full license text, please see the [LICENSE](LICENSE) file in this repository.
 
-See the [LICENSE](LICENSE) file for more details.
+## 🗺️ Roadmap
 
-```text
-MIT License
+We have exciting plans for the future of `docsagev2`! Here's a glimpse of what's on the horizon:
 
-Copyright (c) 2024 docsagev2
+*   **More Document Types**: Support for generating `CHANGELOG.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md` (separate from CONTRIBUTING.md), and project-specific documentation.
+*   **Custom Templates**: Allow users to provide their own markdown templates for AI to fill, offering even greater customization.
+*   **Configuration File Support**: Introduce a `docsage.json` or similar config file for persistent project-specific settings, reducing CLI argument verbosity.
+*   **Integration with CI/CD**: Provide GitHub Actions or other CI/CD pipeline integrations for automatic documentation updates.
+*   **Language Support**: Extend generation capabilities to multiple human languages.
+*   **Enhanced Diagramming**: More complex and diverse Mermaid diagram types based on project context (e.g., state diagrams, class diagrams).
+*   **Interactive Preview**: A local server or command to preview generated Markdown before saving.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+## 🙏 Acknowledgements
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+`docsagev2` wouldn't be possible without the incredible work of the open-source community and Google's advancements in AI. We extend our sincere thanks to:
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-```
+*   **Google Gemini AI**: For providing the powerful large language models that drive the core generation capabilities.
+*   **All open-source library maintainers**: Especially those behind Node.js, TypeScript, Commander.js, Inquirer.js, Chalk, Ora, and many others, whose tools form the foundation of this project.
 
 ---
-
-## Roadmap
-
-`docsagev2` is under active development, and we have exciting plans for its future. Here's a glimpse of what's on the horizon:
-
--   **Support for More Document Types**: Expand generation capabilities to include API documentation, design documents, security policies, and more.
--   **Advanced Customization Options**: Provide more granular control over generated content, including custom templates and section ordering.
--   **Multi-AI Model Support**: Integrate with other large language models (LLMs) to offer users more choice and flexibility.
--   **Configuration File Support**: Introduce a `docsage.json` or similar configuration file for project-specific default settings.
--   **Git Integration Enhancements**: Smarter suggestions for `CONTRIBUTING.md` based on existing `.github` templates or commit history.
--   **Web UI / Desktop Application**: Explore options for a graphical interface to make documentation generation even more accessible.
--   **CI/CD Integration**: Tools and guidelines for integrating `docsagev2` into continuous integration/continuous deployment pipelines to ensure documentation stays up-to-date.
--   **Plugin Architecture**: Allow community-driven extensions for custom document types or integrations.
-
----
-
-## Acknowledgements
-
-We extend our gratitude to the creators and maintainers of the following open-source projects and services that make `docsagev2` possible:
-
--   [Google Generative AI](https://ai.google.dev/) for providing the powerful Gemini models.
--   [Node.js](https://nodejs.org/) for the excellent JavaScript runtime.
--   [TypeScript](https://www.typescriptlang.org/) for making JavaScript development a joy.
--   [Commander.js](https://github.com/tj/commander.js) for simplifying CLI development.
--   [Inquirer.js](https://github.com/SBoudrias/Inquirer.js) for interactive prompts.
--   [Chalk](https://github.com/chalk/chalk), [Boxen](https://github.com/sindresorhus/boxen), [Figlet](https://github.com/patorjk/figlet.js), [Gradient-String](https://github.com/sindresorhus/gradient-string), [Ora](https://github.com/sindresorhus/ora) for enhancing the CLI experience.
--   [Mermaid.js](https://mermaid.js.org/) for beautiful diagrams in Markdown.
--   All other open-source libraries and contributors that form the foundation of this project.
-
-Thank you for being a part of the `docsagev2` journey!
+<p align="center">
+  <sub>📝 Generated with <a href="https://github.com/Owusu1946/docsagev2">DocSage</a> - AI-powered documentation</sub>
+</p>

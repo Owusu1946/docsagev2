@@ -91,30 +91,36 @@ const resetApiKey = async (): Promise<void> => {
     console.log(chalk.green('✓ API key removed. You will be prompted for a new key next time.\n'));
 };
 
-const openDiffInEditor = async (originalPath: string, newPath: string): Promise<boolean> => {
+const openDiffInEditor = (originalPath: string, newPath: string): void => {
     try {
-        // Verify the new file exists before trying to open diff
-        await fs.access(newPath);
+        // Resolve to absolute paths to ensure they work from any context
+        const absOriginal = path.resolve(originalPath);
+        const absNew = path.resolve(newPath);
 
-        // Use spawn with detached to prevent blocking terminal stdin
-        // Quote paths to handle spaces in directory names
-        const child = spawn('code', ['--diff', `"${originalPath}"`, `"${newPath}"`], {
-            detached: true,
-            stdio: 'ignore',
-            shell: true
-        });
-        child.unref();
+        // On Windows, we need shell: true for 'code' command to work
+        // But we must properly quote paths to handle spaces
+        const isWindows = process.platform === 'win32';
 
-        // Give VS Code a moment to read the file
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        if (isWindows) {
+            // Use cmd /c to properly execute the VS Code command on Windows
+            const child = spawn('cmd', ['/c', 'code', '--diff', absOriginal, absNew], {
+                detached: true,
+                stdio: 'ignore',
+                windowsHide: true
+            });
+            child.unref();
+        } else {
+            // On Unix-like systems, spawn directly without shell
+            const child = spawn('code', ['--diff', absOriginal, absNew], {
+                detached: true,
+                stdio: 'ignore'
+            });
+            child.unref();
+        }
 
         console.log(chalk.cyan('\n📝 Diff opened in VS Code editor. Review the changes there.\n'));
-        return true;
     } catch (error) {
-        console.log(chalk.yellow('\n⚠️ Could not open VS Code diff. Make sure "code" is in your PATH.\n'));
-        console.log(chalk.dim(`Original: ${originalPath}`));
-        console.log(chalk.dim(`New: ${newPath}\n`));
-        return false;
+        console.log(chalk.yellow('\n⚠️ Could not open VS Code. Make sure "code" is in your PATH.\n'));
     }
 };
 
@@ -132,11 +138,8 @@ const writeToFile = async (filename: string, content: string) => {
         const tempFilePath = path.join(tempDir, `${filename}.new`);
         await fs.writeFile(tempFilePath, content, 'utf-8');
 
-        // Small delay to ensure file is flushed to disk
-        await new Promise(resolve => setTimeout(resolve, 200));
-
-        // Open diff in editor (now async)
-        const diffOpened = await openDiffInEditor(filePath, tempFilePath);
+        // Open diff in editor
+        openDiffInEditor(filePath, tempFilePath);
 
         // Small delay to let terminal stabilize after spawning VS Code
         await new Promise(resolve => setTimeout(resolve, 500));
