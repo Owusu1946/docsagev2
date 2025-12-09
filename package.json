@@ -1,19 +1,46 @@
 {
-  "name": "docsage2",
+  "name": "docsagev2",
   "version": "1.0.0",
-  "main": "index.js",
+  "description": "AI-powered CLI tool that automatically generates professional README.md, CONTRIBUTING.md, and LICENSE files using Google Gemini AI",
+  "main": "dist/src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "documentation",
+    "readme",
+    "readme-generator",
+    "ai",
+    "gemini",
+    "google-gemini",
+    "cli",
+    "markdown",
+    "contributing",
+    "license",
+    "doc-generator",
+    "developer-tools",
+    "automation",
+    "typescript",
+    "nodejs"
+  ],
+  "author": "Owusu1946",
   "license": "ISC",
-  "description": "",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Owusu1946/docsagev2.git"
+  },
+  "homepage": "https://github.com/Owusu1946/docsagev2#readme",
+  "bugs": {
+    "url": "https://github.com/Owusu1946/docsagev2/issues"
+  },
   "type": "module",
   "bin": {
-    "docsage": "./dist/bin/cli.js"
+    "docsage": "./dist/src/bin/cli.js"
   },
+  "files": [
+    "dist"
+  ],
   "devDependencies": {
     "@types/diff": "^8.0.0",
     "@types/figlet": "^1.7.0",
