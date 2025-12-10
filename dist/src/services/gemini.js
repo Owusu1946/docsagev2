@@ -54,9 +54,11 @@ export class GeminiService {
     `;
         if (onProgress)
             onProgress('Generating README content with Gemini...');
-        const result = await this.model.generateContent(prompt);
-        const response = await result.response;
-        return response.text();
+        return this.retryOperation(async () => {
+            const result = await this.model.generateContent(prompt);
+            const response = await result.response;
+            return response.text();
+        });
     }
     async generateContributing(cwd, options = { codeOfConduct: 'Contributor Covenant', includeTemplates: false }, onProgress) {
         const keyFiles = await getKeyFilesContent(cwd, onProgress);
@@ -74,9 +76,11 @@ export class GeminiService {
     `;
         if (onProgress)
             onProgress('Generating CONTRIBUTING.md...');
-        const result = await this.model.generateContent(prompt);
-        const response = await result.response;
-        return response.text();
+        return this.retryOperation(async () => {
+            const result = await this.model.generateContent(prompt);
+            const response = await result.response;
+            return response.text();
+        });
     }
     async generateLicense(cwd, options = { licenseType: 'MIT', author: 'The Maintainers' }, onProgress) {
         if (onProgress)
@@ -92,9 +96,11 @@ export class GeminiService {
     `;
         if (onProgress)
             onProgress('Generating LICENSE text...');
-        const result = await this.model.generateContent(prompt);
-        const response = await result.response;
-        return response.text();
+        return this.retryOperation(async () => {
+            const result = await this.model.generateContent(prompt);
+            const response = await result.response;
+            return response.text();
+        });
     }
     async generateCodeOfConduct(options = { conductType: 'Contributor Covenant', contactEmail: '' }, onProgress) {
         if (onProgress)
@@ -119,9 +125,11 @@ export class GeminiService {
     `;
         if (onProgress)
             onProgress('Generating CODE_OF_CONDUCT.md...');
-        const result = await this.model.generateContent(prompt);
-        const response = await result.response;
-        return response.text();
+        return this.retryOperation(async () => {
+            const result = await this.model.generateContent(prompt);
+            const response = await result.response;
+            return response.text();
+        });
     }
     /**
      * Generate README using advanced codebase analysis with AST parsing,
@@ -209,8 +217,39 @@ export class GeminiService {
     `;
         if (onProgress)
             onProgress('Generating README with Gemini 2.5 Flash...');
-        const result = await this.model.generateContent(prompt);
-        const response = await result.response;
-        return response.text();
+        return this.retryOperation(async () => {
+            const result = await this.model.generateContent(prompt);
+            const response = await result.response;
+            return response.text();
+        });
+    }
+    /**
+     * Helper to retry operations with exponential backoff
+     * Handles 503 (Overloaded) and 429 (Rate Limit) errors
+     */
+    async retryOperation(operation, maxAttempts = 5, initialDelay = 2000) {
+        let lastError;
+        for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+            try {
+                return await operation();
+            }
+            catch (error) {
+                lastError = error;
+                // Check for retryable errors (503 Service Unavailable, 429 Too Many Requests)
+                const isRetryable = error?.status === 503 ||
+                    error?.status === 429 ||
+                    error?.message?.includes('overloaded') ||
+                    error?.message?.includes('quota');
+                if (isRetryable && attempt < maxAttempts) {
+                    // Exponential backoff with jitter: delay * 2^(attempt-1) + random status
+                    const delay = initialDelay * Math.pow(2, attempt - 1) + (Math.random() * 1000);
+                    console.warn(`    ⚠️  Gemini overloaded (503). Retrying in ${Math.round(delay / 1000)}s... (Attempt ${attempt}/${maxAttempts})`);
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                    continue;
+                }
+                throw error;
+            }
+        }
+        throw lastError;
     }
 }

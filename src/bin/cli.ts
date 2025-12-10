@@ -11,6 +11,7 @@ import gradient from 'gradient-string';
 import { spawn } from 'child_process';
 import { GeminiService } from '../services/gemini.js';
 import { scanCodebase } from '../services/codebase-scanner.js';
+import { generateLogo, hasExistingLogo } from '../services/logo-generator.js';
 import { logger } from '../utils/logger.js';
 import dotenv from 'dotenv';
 
@@ -347,6 +348,51 @@ const main = async () => {
                 }
             ]);
             readmeOptions = { ...opts, style: 'Professional' };
+
+            // Logo generation
+            let logoMarkdown = '';
+            const hasLogo = await hasExistingLogo(cwd);
+
+            if (!hasLogo) {
+                const { generateLogoChoice } = await inquirer.prompt([{
+                    type: 'confirm',
+                    name: 'generateLogoChoice',
+                    message: 'Generate a project logo?',
+                    default: true
+                }]);
+
+                if (generateLogoChoice) {
+                    const { logoStyle } = await inquirer.prompt([{
+                        type: 'list',
+                        name: 'logoStyle',
+                        message: 'Choose logo style:',
+                        choices: [
+                            { name: '🔷 Identicon (GitHub-style geometric)', value: 'identicon' },
+                            { name: '🔤 Initials (Letter-based)', value: 'initials' },
+                            { name: '🔶 Shapes (Abstract)', value: 'shapes' },
+                            { name: '🤖 Bottts (Robot)', value: 'bottts' },
+                            { name: '👾 Pixel Art', value: 'pixel-art' }
+                        ],
+                        default: 'identicon'
+                    }]);
+
+                    const logoSpinner = ora('Generating logo...').start();
+                    try {
+                        const logo = await generateLogo({
+                            projectName,
+                            style: logoStyle,
+                            size: 128,
+                            outputDir: cwd
+                        });
+                        logoSpinner.succeed(`Logo generated: assets/logo.svg`);
+                        logoMarkdown = logo.markdown;
+                    } catch (err) {
+                        logoSpinner.fail('Logo generation failed, continuing without logo');
+                    }
+                }
+            } else {
+                console.log(chalk.dim('  ℹ️  Existing logo detected, skipping generation'));
+            }
 
             console.log(chalk.cyan('\n🔬 Deep Codebase Analysis\n'));
 

@@ -56,36 +56,106 @@ Copyright Holder: ${author}
 `;
 
 export const README_ADVANCED_PROMPT = `
-You are an expert README generator. Create a professional README.md using the codebase analysis data provided.
+You are an expert README generator. Create a COMPREHENSIVE and DETAILED README.md (350-450 lines) using the codebase analysis data provided.
 
-RULES:
-1. Use ONLY the data given - never guess or assume
-2. Include shields.io badges for the detected tech stack
-3. If APIs are listed, add an API Reference table
-4. Create a Mermaid architecture diagram based on the patterns detected
-5. Keep explanations concise but informative
+CRITICAL REQUIREMENTS:
+1. Generate DETAILED content - aim for 350-450 lines minimum
+2. Use ONLY the data given - never guess or assume
+3. Include shields.io badges for ALL detected technologies
+4. Create Mermaid diagrams where applicable
+5. Use emojis to make sections visually engaging 🚀
 
-STRUCTURE:
-1. Hero (centered title, badges, one-line description)
-2. Table of Contents
-3. Overview (2-3 sentences based on detected patterns/APIs)
-4. Features (bullet list from capabilities found)
-5. Tech Stack (table: Category | Technology)
-6. Architecture (Mermaid flowchart + brief pattern explanations)
-7. API Reference (table if endpoints exist)
-8. Installation (\`npm install\` + scripts from package.json)
-9. Usage (basic examples)
-10. Contributing (link to CONTRIBUTING.md)
-11. License
+TABLE OF CONTENTS - Use collapsible accordion:
+\`\`\`html
+<details>
+<summary>📖 Table of Contents</summary>
 
-FOOTER (always include):
+- [Overview](#overview)
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Architecture](#architecture)
+- [Getting Started](#getting-started)
+- [API Reference](#api-reference)
+- [Configuration](#configuration)
+- [Contributing](#contributing)
+- [License](#license)
+
+</details>
 \`\`\`
+
+STRUCTURE (generate ALL sections with RICH content):
+
+1. **Hero Section**
+   - Centered logo (if provided)
+   - Project title with gradient/styled text
+   - One-line tagline
+   - Row of shields.io badges (version, license, build, downloads, etc.)
+
+2. **Overview** (3-5 paragraphs)
+   - What the project does
+   - Why it exists (problem it solves)
+   - Key differentiators
+   - Who it's for
+
+3. **Features** (detailed list with descriptions)
+   - Use tables or expandable sections
+   - Group by category if many features
+   - Include code snippets showing features
+
+4. **Tech Stack** (comprehensive table)
+   | Category | Technology | Purpose |
+   - Include ALL detected frameworks, databases, tools
+
+5. **Architecture** (detailed)
+   - Mermaid flowchart diagram
+   - Explanation of each component
+   - How components interact
+   - Pattern explanations (if detected)
+
+6. **Getting Started**
+   - Prerequisites (with version requirements)
+   - Installation (step-by-step with code blocks)
+   - Environment setup
+   - Running the project
+   - Running tests
+
+7. **API Reference** (if APIs detected)
+   - Table of all endpoints
+   - Request/response examples
+   - Authentication info
+
+8. **Configuration**
+   - Environment variables
+   - Config file options
+   - Examples
+
+9. **Project Structure** (file tree)
+   \`\`\`
+   src/
+   ├── components/
+   ├── services/
+   └── utils/
+   \`\`\`
+
+10. **Contributing**
+    - Link to CONTRIBUTING.md
+    - Quick contribution guide
+    - Code of conduct mention
+
+11. **License**
+    - License badge
+    - Brief description
+
+12. **Footer**
+\`\`\`html
 ---
 <p align="center">
-  <sub>📝 Generated with <a href="https://github.com/Owusu1946/docsagev2">DocSage</a></sub>
+  <sub>📝 Generated with <a href="https://github.com/Owusu1946/docsagev2">DocSage</a> - AI-powered documentation</sub>
 </p>
 \`\`\`
 
-Output ONLY valid Markdown. Be concise.
+REMEMBER: Generate DETAILED, COMPREHENSIVE content. Do NOT be brief. Aim for 350-450 lines.
+Output ONLY valid Markdown.
 `;
+
 
