@@ -1,8 +1,14 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import dotenv from 'dotenv';
 import { getKeyFilesContent, getProjectStructure } from './file-system.js';
-import { README_PROMPT, CONTRIBUTING_PROMPT, README_ADVANCED_PROMPT } from '../utils/prompts.js';
+import { README_PROMPT, CONTRIBUTING_PROMPT, README_ADVANCED_PROMPT, README_UPDATE_PROMPT } from '../utils/prompts.js';
 import type { CodebaseAnalysis } from './codebase-scanner.js';
+
+interface UpdateOperation {
+  op: 'insert' | 'replace';
+  section: string;
+  content: string;
+}
 
 dotenv.config();
 
@@ -285,6 +291,73 @@ export class GeminiService {
       const result = await this.model.generateContent(prompt);
       const response = await result.response;
       return response.text();
+    });
+  }
+
+  /**
+   * Incrementally update README based on git diff
+   */
+  async updateReadme(
+    projectName: string,
+    currentReadme: string,
+    diff: string,
+    commitMessage: string,
+    onProgress?: (msg: string) => void
+  ): Promise<string> {
+    if (onProgress) onProgress('Analyzing code changes for documentation updates...');
+
+    const prompt = `
+      ${README_UPDATE_PROMPT}
+
+      INPUT DATA:
+      - Project Name: ${projectName}
+      - Commit Message: ${commitMessage}
+      - Existing README Context (first 500 lines):
+      ${currentReadme.slice(0, 15000)}
+
+      - Code Changes (Git Diff):
+      ${diff}
+    `;
+
+    return this.retryOperation(async () => {
+      const result = await this.model.generateContent(prompt);
+      const response = await result.response;
+      let text = response.text();
+
+      // Clean up markdown block if present
+      text = text.replace(/```json\n|\n```/g, '').trim();
+
+      try {
+        const operations: UpdateOperation[] = JSON.parse(text);
+        if (operations.length === 0) return currentReadme;
+
+        if (onProgress) onProgress(`Applying ${operations.length} documentation updates...`);
+
+        let updatedReadme = currentReadme;
+
+        for (const op of operations) {
+          if (op.op === 'insert') {
+            // Find section and append
+            const sectionRegex = new RegExp(`(${op.section.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}.*?\n)(.*?)(\n## |$)`, 'zs');
+            if (sectionRegex.test(updatedReadme)) {
+              updatedReadme = updatedReadme.replace(sectionRegex, `$1$2\n${op.content}\n$3`);
+            } else {
+              // If section not found, append to end
+              updatedReadme += `\n\n${op.section}\n${op.content}`;
+            }
+          } else if (op.op === 'replace') {
+            const sectionRegex = new RegExp(`${op.section.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}.*?(?=\n## |$)`, 'zs');
+            if (sectionRegex.test(updatedReadme)) {
+              updatedReadme = updatedReadme.replace(sectionRegex, `${op.section}\n${op.content}`);
+            }
+          }
+        }
+        return updatedReadme;
+
+      } catch (e) {
+        console.error('Failed to parse update operations:', e);
+        return currentReadme;
+      }
     });
   }
 

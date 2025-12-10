@@ -12,7 +12,9 @@ import { spawn } from 'child_process';
 import { GeminiService } from '../services/gemini.js';
 import { scanCodebase } from '../services/codebase-scanner.js';
 import { generateLogo, hasExistingLogo } from '../services/logo-generator.js';
+import { GitService } from '../services/git-service.js';
 import { logger } from '../utils/logger.js';
+import * as Diff from 'diff';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -539,9 +541,66 @@ const main = async () => {
     }
 };
 
+// Assuming 'program' is defined elsewhere, e.g., `const { Command } = require('commander'); const program = new Command();`
+program
+    .command('update')
+    .description('Incrementally update README.md based on recent code changes')
+    .action(async () => {
+        try {
+            displayTitle();
+            const cwd = process.cwd();
+            const apiKey = await getApiKey();
+            const gemini = new GeminiService(apiKey);
+            const git = new GitService();
+
+            if (!await git.isGitRepo(cwd)) {
+                logger.error('Not a git repository. Please run this command in a git repository.');
+                process.exit(1);
+            }
+
+            const diff = await git.getDiff(cwd);
+            if (!diff) {
+                logger.info('No recent code changes found to document.');
+                return;
+            }
+
+            const commitMessage = await git.getLastCommitMessage(cwd);
+            const readmePath = path.join(cwd, 'README.md');
+
+            let currentReadme = '';
+            try {
+                currentReadme = await fs.readFile(readmePath, 'utf-8');
+            } catch (e) {
+                logger.error('README.md not found. Run "docsage" to generate one first.');
+                process.exit(1);
+            }
+
+            const spinner = ora('Analyzing code changes & updating README...').start();
+            try {
+                const updatedReadme = await gemini.updateReadme(path.basename(cwd), currentReadme, diff, commitMessage);
+
+                // Show diff
+                await showDiff(currentReadme, updatedReadme, readmePath);
+
+                spinner.succeed('Analysis complete!');
+            } catch (error: any) {
+                spinner.fail(`Update failed: ${error.message}`);
+                process.exit(1);
+            }
+
+        } catch (error: any) {
+            logger.error(`Error: ${error.message}`);
+            process.exit(1);
+        }
+    });
+
 // Check for config command first
+// Check for commands
 const args = process.argv.slice(2);
-if (args[0] === 'config') {
+
+if (args[0] === 'update') {
+    program.parse(process.argv);
+} else if (args[0] === 'config') {
     if (args.includes('--reset') || args.includes('-r')) {
         displayTitle();
         resetApiKey().then(() => process.exit(0));
@@ -566,8 +625,54 @@ if (args[0] === 'config') {
         process.exit(0);
     }
 } else {
+    // Default interactive mode
     main().catch((err) => {
         logger.error(err);
         process.exit(1);
     });
+}
+/**
+ * Show diff between current and new README
+ */
+async function showDiff(current: string, updated: string, filepath: string) {
+    const diff = Diff.diffLines(current, updated);
+    let hasChanges = false;
+
+    console.log(chalk.bold('\n📝 Proposed Changes:\n'));
+
+    diff.forEach((part) => {
+        if (part.added || part.removed) {
+            hasChanges = true;
+            const color = part.added ? chalk.green : chalk.red;
+            const prefix = part.added ? '+ ' : '- ';
+
+            // Only show changes and a bit of context
+            console.log(color(part.value.replace(/^/gm, prefix).trimEnd()));
+        } else if (part.count && part.count < 3) {
+            // Show small context
+            console.log(chalk.dim(part.value.trimEnd()));
+        } else {
+            // Skip large unchanged blocks
+            console.log(chalk.dim('...'));
+        }
+    });
+
+    if (!hasChanges) {
+        console.log(chalk.yellow('No significant changes detected.'));
+        return;
+    }
+
+    const { confirm } = await inquirer.prompt([{
+        type: 'confirm',
+        name: 'confirm',
+        message: 'Apply these changes?',
+        default: true
+    }]);
+
+    if (confirm) {
+        await fs.writeFile(filepath, updated);
+        console.log(chalk.green(`\n✔ Updated ${filepath}`));
+    } else {
+        console.log(chalk.yellow('\n⚠ Changes discarded'));
+    }
 }
