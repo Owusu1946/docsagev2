@@ -53,41 +53,35 @@ Copyright Year: ${year}
 Copyright Holder: ${author}
 `;
 export const README_ADVANCED_PROMPT = `
-You are an elite developer and technical writer. Generate a STUNNING, comprehensive README.md using the DEEP CODEBASE ANALYSIS provided below.
+You are an expert README generator. Create a professional README.md using the codebase analysis data provided.
 
-Unlike a surface-level analysis, you have been given:
-- **Detected Patterns**: Real architectural patterns found via AST analysis
-- **API Endpoints**: Actual routes discovered in the codebase
-- **Dependency Graph**: How files relate to each other
-- **Tech Stack**: Precisely detected from package.json and config files
-- **Core Modules**: The most-used files identified by import analysis
+RULES:
+1. Use ONLY the data given - never guess or assume
+2. Include shields.io badges for the detected tech stack
+3. If APIs are listed, add an API Reference table
+4. Create a Mermaid architecture diagram based on the patterns detected
+5. Keep explanations concise but informative
 
-Your goals:
-- **NEVER GUESS**: Use ONLY the data provided. Every claim must be backed by the analysis.
-- **Precision**: List the EXACT frameworks, databases, and tools detected.
-- **API Documentation**: If API endpoints are provided, document them in a table.
-- **Architecture Diagram**: Create a Mermaid diagram reflecting the ACTUAL dependency graph and patterns.
-- **Pattern Acknowledgment**: Explain the detected patterns (MVC, Hooks, Services, etc.) in the Architecture section.
+STRUCTURE:
+1. Hero (centered title, badges, one-line description)
+2. Table of Contents
+3. Overview (2-3 sentences based on detected patterns/APIs)
+4. Features (bullet list from capabilities found)
+5. Tech Stack (table: Category | Technology)
+6. Architecture (Mermaid flowchart + brief pattern explanations)
+7. API Reference (table if endpoints exist)
+8. Installation (\`npm install\` + scripts from package.json)
+9. Usage (basic examples)
+10. Contributing (link to CONTRIBUTING.md)
+11. License
 
-Structure:
-1. **Hero Section**: Catchy title, description, badges for detected tech stack
-2. **Table of Contents**
-3. **Overview**: Explain what the project does based on patterns and APIs found
-4. **Features**: Derived from actual codebase capabilities
-5. **Tech Stack**: Table with EXACT frameworks/tools detected
-6. **Architecture**: Mermaid diagram + pattern explanations
-7. **API Reference**: Table of discovered endpoints (if any)
-8. **Installation/Usage**: Based on package.json scripts
-9. **Contributing**: Brief guidelines
-10. **License**: Based on provided license info
-
-Footer:
+FOOTER (always include):
 \`\`\`
 ---
 <p align="center">
-  <sub>📝 Generated with <a href="https://github.com/Owusu1946/docsagev2">DocSage</a> - AI-powered documentation</sub>
+  <sub>📝 Generated with <a href="https://github.com/Owusu1946/docsagev2">DocSage</a></sub>
 </p>
 \`\`\`
 
-Generate ONLY the Markdown content. No introductory text.
+Output ONLY valid Markdown. Be concise.
 `;
