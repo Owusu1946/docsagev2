@@ -10,6 +10,7 @@ import figlet from 'figlet';
 import gradient from 'gradient-string';
 import { spawn } from 'child_process';
 import { GeminiService } from '../services/gemini.js';
+import { scanCodebase } from '../services/codebase-scanner.js';
 import { logger } from '../utils/logger.js';
 import dotenv from 'dotenv';
 
@@ -40,9 +41,9 @@ const saveConfig = async (config: DocsageConfig): Promise<void> => {
 };
 
 const displayTitle = () => {
-    const title = figlet.textSync('DocSage', { font: 'Slant' });
+    const title = figlet.textSync('DocSage v2', { font: 'Slant' });
     console.log(gradient.pastel.multiline(title));
-    console.log(chalk.dim('  AI-Powered Documentation Generator\n'));
+    console.log(chalk.green('  AI-Powered Documentation Generator\n'));
 };
 
 const getApiKey = async (): Promise<string> => {
@@ -190,9 +191,10 @@ const main = async () => {
             name: 'docTypes',
             message: 'What documents do you want to generate?',
             choices: [
-                { name: 'README.md', checked: true },
+                { name: 'README.md' },
                 { name: 'CONTRIBUTING.md' },
                 { name: 'LICENSE' },
+                { name: 'CODE_OF_CONDUCT.md' },
             ],
             validate: (val) => val.length > 0 || 'Please select at least one file',
         },
@@ -346,15 +348,47 @@ const main = async () => {
             ]);
             readmeOptions = { ...opts, style: 'Professional' };
 
-            const spinner = ora('Generating README.md...').start();
+            console.log(chalk.cyan('\n🔬 Deep Codebase Analysis\n'));
+
+            // Phase 1: Scan codebase with progress
+            let lastPhase = '';
+            const scanSpinner = ora('Initializing scanner...').start();
+
             try {
-                const readme = await gemini.generateReadme(cwd, projectName, readmeOptions, (msg) => {
-                    spinner.text = msg;
+                const analysis = await scanCodebase(cwd, (phase, current, total, detail) => {
+                    if (phase !== lastPhase) {
+                        lastPhase = phase;
+                        scanSpinner.text = chalk.bold(phase);
+                    }
+                    if (detail) {
+                        scanSpinner.text = `${chalk.bold(phase)} ${chalk.dim(`(${current}/${total})`)} ${chalk.cyan(detail)}`;
+                    } else if (total > 0) {
+                        scanSpinner.text = `${chalk.bold(phase)} ${chalk.dim(`(${current}/${total})`)}`;
+                    }
                 });
-                spinner.succeed('README.md generated!');
+
+                scanSpinner.succeed(`Analyzed ${analysis.stats.analyzedFiles} files, ${analysis.stats.totalLines.toLocaleString()} lines`);
+
+                // Show discovered info
+                if (analysis.techStack.frameworks.length > 0) {
+                    console.log(chalk.dim(`  ├── Frameworks: ${analysis.techStack.frameworks.join(', ')}`));
+                }
+                if (analysis.patterns.length > 0) {
+                    console.log(chalk.dim(`  ├── Patterns: ${analysis.patterns.map(p => p.name).join(', ')}`));
+                }
+                if (analysis.apis.length > 0) {
+                    console.log(chalk.dim(`  └── API Endpoints: ${analysis.apis.length} found`));
+                }
+
+                // Phase 2: Generate README with Gemini
+                const genSpinner = ora('Generating README with AI...').start();
+                const readme = await gemini.generateReadmeAdvanced(projectName, analysis, readmeOptions, (msg) => {
+                    genSpinner.text = msg;
+                });
+                genSpinner.succeed('README.md generated!');
                 await writeToFile('README.md', readme);
             } catch (error) {
-                spinner.fail('Failed to generate README.md');
+                scanSpinner.fail('Failed to generate README.md');
                 console.error(error);
             }
         }
@@ -421,6 +455,38 @@ const main = async () => {
                 await writeToFile('LICENSE', license);
             } catch (error) {
                 spinner.fail('Failed to generate LICENSE');
+                console.error(error);
+            }
+        }
+
+        // CODE_OF_CONDUCT.md (Standalone)
+        if (docTypes.includes('CODE_OF_CONDUCT.md')) {
+            console.log(chalk.cyan('\n📜 Configuring CODE_OF_CONDUCT.md...\n'));
+            const cocOpts = await inquirer.prompt([
+                {
+                    type: 'list',
+                    name: 'conductType',
+                    message: 'Select Code of Conduct:',
+                    choices: ['Contributor Covenant', 'Citizen Code of Conduct'],
+                    default: 'Contributor Covenant'
+                },
+                {
+                    type: 'input',
+                    name: 'contactEmail',
+                    message: 'Contact email for reporting violations:',
+                    validate: (input) => input.length > 0 || 'Email is required for Code of Conduct'
+                }
+            ]);
+
+            const spinner = ora('Generating CODE_OF_CONDUCT.md...').start();
+            try {
+                const codeOfConduct = await gemini.generateCodeOfConduct(cocOpts, (msg) => {
+                    spinner.text = msg;
+                });
+                spinner.succeed('CODE_OF_CONDUCT.md generated!');
+                await writeToFile('CODE_OF_CONDUCT.md', codeOfConduct);
+            } catch (error) {
+                spinner.fail('Failed to generate CODE_OF_CONDUCT.md');
                 console.error(error);
             }
         }

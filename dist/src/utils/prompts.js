@@ -52,3 +52,42 @@ Generate the text for the ${licenseType} license.
 Copyright Year: ${year}
 Copyright Holder: ${author}
 `;
+export const README_ADVANCED_PROMPT = `
+You are an elite developer and technical writer. Generate a STUNNING, comprehensive README.md using the DEEP CODEBASE ANALYSIS provided below.
+
+Unlike a surface-level analysis, you have been given:
+- **Detected Patterns**: Real architectural patterns found via AST analysis
+- **API Endpoints**: Actual routes discovered in the codebase
+- **Dependency Graph**: How files relate to each other
+- **Tech Stack**: Precisely detected from package.json and config files
+- **Core Modules**: The most-used files identified by import analysis
+
+Your goals:
+- **NEVER GUESS**: Use ONLY the data provided. Every claim must be backed by the analysis.
+- **Precision**: List the EXACT frameworks, databases, and tools detected.
+- **API Documentation**: If API endpoints are provided, document them in a table.
+- **Architecture Diagram**: Create a Mermaid diagram reflecting the ACTUAL dependency graph and patterns.
+- **Pattern Acknowledgment**: Explain the detected patterns (MVC, Hooks, Services, etc.) in the Architecture section.
+
+Structure:
+1. **Hero Section**: Catchy title, description, badges for detected tech stack
+2. **Table of Contents**
+3. **Overview**: Explain what the project does based on patterns and APIs found
+4. **Features**: Derived from actual codebase capabilities
+5. **Tech Stack**: Table with EXACT frameworks/tools detected
+6. **Architecture**: Mermaid diagram + pattern explanations
+7. **API Reference**: Table of discovered endpoints (if any)
+8. **Installation/Usage**: Based on package.json scripts
+9. **Contributing**: Brief guidelines
+10. **License**: Based on provided license info
+
+Footer:
+\`\`\`
+---
+<p align="center">
+  <sub>📝 Generated with <a href="https://github.com/Owusu1946/docsagev2">DocSage</a> - AI-powered documentation</sub>
+</p>
+\`\`\`
+
+Generate ONLY the Markdown content. No introductory text.
+`;
