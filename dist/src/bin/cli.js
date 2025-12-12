@@ -498,39 +498,52 @@ const main = async () => {
         }
     }
 };
-// Check for config command first
-const args = process.argv.slice(2);
-if (args[0] === 'config') {
-    if (args.includes('--reset') || args.includes('-r')) {
+// Load config and version
+const version = '1.0.12'; // hardcoded to match package.json for now, or read it
+program
+    .name('docsage')
+    .description('AI-powered CLI tool that automatically generates professional README.md, CONTRIBUTING.md, and LICENSE files using Google Gemini AI')
+    .version(version, '-v, --version', 'output the current version');
+program.command('config')
+    .description('Manage DocSage configuration')
+    .option('-s, --show', 'Show saved API key (masked)')
+    .option('-r, --reset', 'Remove saved API key')
+    .action(async (options) => {
+    if (options.reset) {
         displayTitle();
-        resetApiKey().then(() => process.exit(0));
+        await resetApiKey();
     }
-    else if (args.includes('--show') || args.includes('-s')) {
+    else if (options.show) {
         displayTitle();
-        loadConfig().then(config => {
-            if (config.apiKey) {
-                const masked = config.apiKey.slice(0, 6) + '...' + config.apiKey.slice(-4);
-                console.log(chalk.cyan(`Saved API Key: ${masked}`));
-                console.log(chalk.dim(`Config location: ${CONFIG_FILE}`));
-            }
-            else {
-                console.log(chalk.yellow('No API key saved. Run docsage to set one.'));
-            }
-            process.exit(0);
-        });
+        const config = await loadConfig();
+        if (config.apiKey) {
+            const masked = config.apiKey.slice(0, 6) + '...' + config.apiKey.slice(-4);
+            console.log(chalk.cyan(`Saved API Key: ${masked}`));
+            console.log(chalk.dim(`Config location: ${CONFIG_FILE}`));
+        }
+        else {
+            console.log(chalk.yellow('No API key saved. Run docsage to set one.'));
+        }
     }
     else {
+        // Default config help
         displayTitle();
         console.log(chalk.bold('DocSage Configuration\n'));
         console.log('  docsage config --show    Show saved API key (masked)');
         console.log('  docsage config --reset   Remove saved API key');
         console.log(`\nConfig file: ${CONFIG_FILE}`);
-        process.exit(0);
     }
-}
-else {
-    main().catch((err) => {
-        logger.error(err);
+});
+// Main wizard action
+program
+    .action(async () => {
+    try {
+        await main();
+    }
+    catch (err) {
+        logger.error(err instanceof Error ? err.message : String(err));
         process.exit(1);
-    });
-}
+    }
+});
+// Parse arguments
+program.parse(process.argv);
