@@ -19,8 +19,8 @@
   </a>
   <img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
   <img src="https://img.shields.io/badge/npm-CB3837?style=for-the-badge&logo=npm&logoColor=white" alt="npm" />
-  <img src="https://img.shields.io/badge/Codebase%20Lines~-2752-blue?style=for-the-badge" alt="Lines of Code" />
-  <img src="https://img.shields.io/badge/Files%20Analyzed-14-orange?style=for-the-badge" alt="Files Analyzed" />
+  <img src="https://img.shields.io/badge/Codebase%20Lines~-287,752-blue?style=for-the-badge" alt="Lines of Code" />
+  <img src="https://img.shields.io/badge/Files%20Analyzed-3,212-orange?style=for-the-badge" alt="Files Analyzed" />
 </p>
 
 <details>
