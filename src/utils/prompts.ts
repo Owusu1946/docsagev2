@@ -55,45 +55,6 @@ Copyright Year: ${year}
 Copyright Holder: ${author}
 `;
 
-export const README_UPDATE_PROMPT = `
-You are a documentation maintenance expert. Your job is to update an existing README.md based on new code changes.
-
-CRITICAL RULES:
-1. **INCREMENTAL ONLY**: Do NOT rewrite the entire file. Only output the NEW or MODIFIED sections.
-2. **CONTEXT AWARE**: Use the "Existing README" to find the right place to insert changes.
-3. **DIFF DRIVEN**: Use the "Code Changes (Git Diff)" to understand exactly what features were added or changed.
-
-INPUT DATA:
-- **Project Name**: \${projectName}
-- **Commit Message**: \${commitMessage}
-- **Code Changes**: 
-  \${diff}
-
-YOUR OUTPUT FORMAT (JSON):
-Return a JSON array of operations.
-Types of operations:
-- \`insert\`: Add new content after a specific header.
-- \`replace\`: Replace a specific section if it's outdated.
-
-Example Output:
-\`\`\`json
-[
-  {
-    "op": "insert",
-    "section": "## Features",
-    "content": "- **New Feature**: Description of the new feature based on the diff."
-  },
-  {
-    "op": "replace",
-    "section": "## API Reference",
-    "content": "Updated API table..."
-  }
-]
-\`\`\`
-
-Analyze the diff and generate the JSON updates. If no documentation changes are needed, return an empty array [].
-`;
-
 export const README_ADVANCED_PROMPT = `
 You are an expert README generator. Create a COMPREHENSIVE and DETAILED README.md (350-450 lines) using the codebase analysis data provided.
 

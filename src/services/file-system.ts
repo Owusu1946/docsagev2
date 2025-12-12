@@ -5,7 +5,7 @@ import path from 'path';
 export const getProjectStructure = async (cwd: string): Promise<string> => {
     const options = {
         cwd,
-        ignore: ['node_modules/**', 'dist/**', '.git/**', '.env', 'package-lock.json', 'yarn.lock'],
+        ignore: ['node_modules/**', 'dist/**', '.git/**', '.env', 'package-lock.json', 'yarn.lock', '.gitignore'],
         dot: true,
     };
 
