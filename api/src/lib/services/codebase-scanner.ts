@@ -16,6 +16,7 @@ import { glob } from 'glob';
 import fs from 'fs/promises';
 import path from 'path';
 import pLimit from 'p-limit';
+import util from 'util';
 
 // ============ TYPES ============
 
@@ -245,12 +246,13 @@ export class CodebaseScanner {
     // ============ FAST FILE DISCOVERY ============
 
     private async discoverFiles(): Promise<string[]> {
-        return glob('**/*', {
+        const globPromise = util.promisify(glob);
+        return globPromise('**/*', {
             cwd: this.cwd,
             ignore: IGNORED_PATTERNS,
             nodir: true,
             absolute: true
-        });
+        }) as Promise<string[]>;
     }
 
     private selectFilesForAnalysis(files: string[]): string[] {

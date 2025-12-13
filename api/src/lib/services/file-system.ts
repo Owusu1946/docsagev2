@@ -1,6 +1,7 @@
 import { glob } from 'glob';
 import fs from 'fs/promises';
 import path from 'path';
+import util from 'util';
 
 export const getProjectStructure = async (cwd: string): Promise<string> => {
     const options = {
@@ -9,7 +10,8 @@ export const getProjectStructure = async (cwd: string): Promise<string> => {
         dot: true,
     };
 
-    const files = await glob('**/*', options);
+    const globPromise = util.promisify(glob);
+    const files = await globPromise('**/*', options) as string[];
     return files.join('\n');
 };
 
