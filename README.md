@@ -41,7 +41,7 @@
 
 ## ✨ Overview
 
-DocSage v2 is an innovative, AI-powered command-line interface (CLI) tool meticulously designed to automate the generation of comprehensive and high-quality documentation for your software projects. Leveraging advanced codebase analysis and sophisticated AI models, DocSage v2 streamlines the often tedious process of creating essential project files like `README.md`, `CONTRIBUTING.md`, and `LICENSE` documents. It delves deep into your project's structure, understanding its components, dependencies, and overall architecture to craft contextually relevant and accurate documentation.
+DocSage v2 is an innovative, AI-Powered command-line interface (CLI) tool meticulously designed to automate the generation of comprehensive and high-quality documentation for your software projects. Whether it's your local code or a remote GitHub repository, DocSage v2 leverages advanced codebase analysis and sophisticated AI models to streamline the creation of `README.md`, `CONTRIBUTING.md`, and `LICENSE` documents.
 
 The core motivation behind DocSage v2 is to solve the pervasive problem of outdated, incomplete, or non-existent project documentation. Developers frequently struggle to allocate sufficient time for documentation, leading to knowledge gaps that hinder onboarding, collaboration, and long-term maintainability. By automating this critical task, DocSage v2 empowers development teams to maintain impeccable documentation standards without diverting valuable engineering resources from core development efforts. It ensures that every project, regardless of its size or complexity, can have clear, well-structured, and up-to-date informational resources.
 
@@ -62,6 +62,7 @@ DocSage v2 offers a robust set of features designed to make documentation genera
 |                         | Dynamic Logo Generation                        | Includes `src/services/logo-generator.ts` which provides functionalities to manage and potentially generate or integrate project logos based on specified `LogoOptions`, ensuring a complete and professional documentation package. Output includes `GeneratedLogo` data.                                                                                                            |
 | **Developer Experience** | Command-Line Interface (CLI)                   | Provides a straightforward and intuitive command-line interface (`src/bin/cli.ts`) for easy execution and interaction. Users can initiate documentation generation with simple commands.                                                                                                                                                                                              |
 |                         | Integrated Logging                             | Incorporates a centralized logging utility (`src/utils/logger.ts`) to provide clear feedback during the documentation generation process, indicating progress, warnings, and errors directly to the user.                                                                                                                                                                             |
+|                         | **New! Remote Repo Analysis**                  | Generate documentation for ANY public GitHub repository without manual cloning. Simply run `docsage <repo-url>` to analyze, generate, and save the README locally.                                                                                                                                                                                                           |
 | **Maintainability**     | Service Layer Architecture                     | Built upon a robust "Service Layer" architectural pattern, promoting separation of concerns, modularity, and easier maintenance. This design makes the codebase highly scalable and extensible for future enhancements.                                                                                                                                                              |
 
 **Example CLI Usage:**
@@ -71,6 +72,12 @@ To generate documentation for your project:
 ```bash
 # Assuming docsagev2 is installed globally
 docsagev2 generate
+```
+
+To generate documentation for a remote GitHub repository:
+
+```bash
+docsagev2 https://github.com/username/repository
 ```
 
 This command would trigger the codebase scanner, feed the analysis to the AI service, and then generate the required documentation files in your project's root directory.

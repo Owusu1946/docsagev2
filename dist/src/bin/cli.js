@@ -12,6 +12,7 @@ import { spawn } from 'child_process';
 import { GeminiService } from '../services/gemini.js';
 import { scanCodebase } from '../services/codebase-scanner.js';
 import { generateLogo, hasExistingLogo } from '../services/logo-generator.js';
+import { GitService } from '../services/git-service.js';
 import { logger } from '../utils/logger.js';
 import dotenv from 'dotenv';
 dotenv.config();
@@ -534,11 +535,69 @@ program.command('config')
         console.log(`\nConfig file: ${CONFIG_FILE}`);
     }
 });
-// Main wizard action
+// Main action
 program
-    .action(async () => {
+    .argument('[repoUrl]', 'Optional GitHub repository URL to analyze remotely')
+    .action(async (repoUrl) => {
     try {
-        await main();
+        if (repoUrl && (repoUrl.startsWith('http') || repoUrl.startsWith('git@'))) {
+            // ===== REMOTE REPO MODE =====
+            const gitService = new GitService();
+            if (!gitService.isValidUrl(repoUrl)) {
+                logger.error('Invalid repository URL provided.');
+                process.exit(1);
+            }
+            displayTitle();
+            // Get API key first
+            const apiKey = await getApiKey();
+            const gemini = new GeminiService(apiKey);
+            let tempPath = '';
+            const cloneSpinner = ora(`Cloning ${repoUrl}...`).start();
+            try {
+                // 1. Clone
+                tempPath = await gitService.cloneRepository(repoUrl);
+                cloneSpinner.succeed('Repository cloned successfully');
+                // 2. Scan
+                console.log(chalk.cyan('\n🔬 Deep Codebase Analysis (Remote)\n'));
+                let lastPhase = '';
+                const scanSpinner = ora('Initializing scanner...').start();
+                const analysis = await scanCodebase(tempPath, (phase, current, total, detail) => {
+                    if (phase !== lastPhase) {
+                        lastPhase = phase;
+                        scanSpinner.text = chalk.bold(phase);
+                    }
+                });
+                scanSpinner.succeed(`Analyzed ${analysis.stats.analyzedFiles} files, ${analysis.stats.totalLines.toLocaleString()} lines`);
+                // 3. Generate
+                const genSpinner = ora('Generating README with AI...').start();
+                const repoName = repoUrl.split('/').pop()?.replace('.git', '') || 'repository';
+                const readme = await gemini.generateReadmeAdvanced(repoName, analysis, {
+                    style: 'Professional',
+                    includeBadges: true
+                }, (msg) => {
+                    genSpinner.text = msg;
+                });
+                genSpinner.succeed('README.md generated!');
+                // 4. Save to CWD
+                const outputFilename = `README-${repoName}.md`;
+                console.log(chalk.green(`\n✓ Saved generated documentation to: ${outputFilename}`));
+                await fs.writeFile(path.join(process.cwd(), outputFilename), readme, 'utf-8');
+            }
+            catch (error) {
+                cloneSpinner.fail('Remote analysis failed');
+                logger.error(error instanceof Error ? error.message : String(error));
+            }
+            finally {
+                // 5. Cleanup
+                if (tempPath) {
+                    await gitService.cleanup(tempPath);
+                }
+            }
+        }
+        else {
+            // ===== STANDARD INTERACTIVE MODE =====
+            await main();
+        }
     }
     catch (err) {
         logger.error(err instanceof Error ? err.message : String(err));
