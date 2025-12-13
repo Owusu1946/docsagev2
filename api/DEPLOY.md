@@ -11,7 +11,9 @@ Vercel is great for serverless deployment.
 2.  **Import to Vercel**:
     -   Go to [Vercel Dashboard](https://vercel.com/dashboard) and click "Add New Project".
     -   Select your repository.
-    -   **Root Directory**: Click "Edit" and select `api` (since this is a monorepo structure).
+    -   **Root Directory**: Click "Edit" and select `api`.
+    -   **Framework Preset**: Select "Other" (or let it auto-detect, but we have a custom `vercel.json` which it should pick up).
+    -   *Crucial*: We use `src/serverless.ts` as the entry point for Vercel to avoid timeouts (500 Errors).
 3.  **Environment Variables**:
     -   Add `GEMINI_API_KEY` with your key.
 4.  **Deploy**: Vercel will detect `nest` and build it automatically.
