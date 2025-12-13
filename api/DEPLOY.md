@@ -20,24 +20,27 @@ Vercel is great for serverless deployment.
     -   *Note*: A `vercel.json` file is included to help configuring the serverless function.
 
 ## Option 2: Render (Recommended for "Always On")
-Render is an excellent alternative that runs the API as a standard Node.js service.
+Render is robust and does not have the execution timeout limits of Vercel Free Tier.
 
-1.  **Push to GitHub**.
-2.  **Create Web Service**:
-    -   Go to [Render Dashboard](https://dashboard.render.com/) -> New -> Web Service.
-    -   Connect your repo.
-3.  **Settings**:
-    -   **Root Directory**: `api`
-    -   **Build Command**: `npm install && npm run build`
-    -   **Start Command**: `npm run start:prod`
-4.  **Environment Variables**:
-    -   `GEMINI_API_KEY`: Your key.
-    -   `NODE_VERSION`: `18` or higher (optional, but recommended).
+### Method A: Blueprints (Easiest)
+1.  **Push** this code to GitHub.
+2.  Go to [Render Dashboard](https://dashboard.render.com/) -> **Blueprints**.
+3.  Click **New Blueprint Instance**.
+4.  Connect your repository.
+5.  Render will automatically read `api/render.yaml` and set everything up.
+6.  You just need to provide the `GEMINI_API_KEY` when prompted.
+
+### Method B: Manual Web Service
+1.  Create **Web Service**.
+2.  **Root Directory**: `api`
+3.  **Build Command**: `npm install && npm run build`
+4.  **Start Command**: `npm run start:prod`
+5.  **Env Vars**: `GEMINI_API_KEY`
 
 ## Testing Deployment
 Once deployed, use your URL:
 ```bash
-curl -X POST https://your-app.vercel.app/api/docs/generate \
+curl -X POST https://your-app.onrender.com/api/docs/generate \
   -H "Content-Type: application/json" \
   -d '{"repoUrl": "https://github.com/nestjs/typescript-starter"}'
 ```
