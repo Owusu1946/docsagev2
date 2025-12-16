@@ -19,9 +19,10 @@ app.get('/', (req, res) => {
 // Generate Docs Endpoint
 app.post('/api/generate-docs', generateDocs);
 
-// Keep-alive mechanism for Render (runs every 10 minutes)
+// Keep-alive mechanism for Render
 const KEEP_ALIVE_URL = 'https://docsagev2.onrender.com';
-setInterval(async () => {
+
+const pingKeepAlive = async () => {
     try {
         console.log(`[Keep-Alive] Pinging ${KEEP_ALIVE_URL}...`);
         const response = await fetch(KEEP_ALIVE_URL);
@@ -29,7 +30,13 @@ setInterval(async () => {
     } catch (error: any) {
         console.error(`[Keep-Alive] Failed: ${error.message}`);
     }
-}, 10 * 60 * 1000);
+};
+
+// Ping once on startup (after 10s) to verify connection
+setTimeout(pingKeepAlive, 10000);
+
+// Ping every 10 minutes
+setInterval(pingKeepAlive, 10 * 60 * 1000);
 
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
