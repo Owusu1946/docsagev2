@@ -4,349 +4,442 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DocSage API</title>
-    <!-- Fonts -->
+    <title>DocSage V2 | Advanced API Tester</title>
+
+    <!-- Libraries -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap"
         rel="stylesheet">
-    <!-- Icons -->
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify/dist/purify.min.js"></script>
 
     <style>
         :root {
-            --bg-color: #0f1115;
-            --card-bg: rgba(22, 25, 30, 0.7);
-            --primary: #3b82f6;
-            --primary-glow: rgba(59, 130, 246, 0.5);
-            --accent: #8b5cf6;
-            --text-main: #ffffff;
-            --text-muted: #94a3b8;
-            --border: rgba(255, 255, 255, 0.1);
+            --bg: #09090b;
+            --surface: #18181b;
+            --surface-hover: #27272a;
+            --primary: #8b5cf6;
+            --primary-dark: #7c3aed;
+            --text: #e4e4e7;
+            --text-muted: #a1a1aa;
+            --border: #27272a;
+            --success: #10b981;
         }
 
         * {
-            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Outfit', sans-serif;
+            box-sizing: border-box;
+            font-family: 'Space Grotesk', sans-serif;
         }
 
         body {
-            background-color: var(--bg-color);
-            background-image:
-                radial-gradient(circle at 0% 0%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
-                radial-gradient(circle at 100% 100%, rgba(139, 92, 246, 0.15) 0%, transparent 50%);
-            color: var(--text-main);
+            background: var(--bg);
+            color: var(--text);
             min-height: 100vh;
             display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            overflow-x: hidden;
-        }
-
-        /* Glassmorphism Container */
-        .container {
-            width: 100%;
-            max-width: 900px;
-            background: var(--card-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--border);
-            border-radius: 24px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            padding: 3rem;
-            position: relative;
+            padding: 2rem;
+            gap: 2rem;
             overflow: hidden;
+            /* Prevent scroll during canvas animation */
         }
 
-        /* Decorative blobs */
-        .container::before {
-            content: '';
-            position: absolute;
-            top: -100px;
-            right: -100px;
-            width: 300px;
-            height: 300px;
-            background: radial-gradient(circle, var(--primary-glow) 0%, transparent 70%);
-            opacity: 0.4;
-            pointer-events: none;
+        /* Layout */
+        .app-container {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 2rem;
+            max-width: 1600px;
+            margin: 0 auto;
+            width: 100%;
+            height: calc(100vh - 4rem);
         }
 
-        .header {
-            text-align: center;
-            margin-bottom: 3rem;
-            position: relative;
-            z-index: 2;
+        /* Sidebar */
+        .sidebar {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            overflow-y: auto;
+            z-index: 20;
         }
 
-        .logo-badge {
-            display: inline-flex;
+        .brand {
+            display: flex;
             align-items: center;
-            gap: 8px;
-            background: rgba(59, 130, 246, 0.1);
-            border: 1px solid rgba(59, 130, 246, 0.3);
-            padding: 6px 16px;
-            border-radius: 20px;
-            color: var(--primary);
-            font-size: 0.85rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        h1 {
-            font-size: 3rem;
+            gap: 0.5rem;
+            font-size: 1.5rem;
             font-weight: 700;
-            background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 0.5rem;
-            letter-spacing: -0.05em;
-        }
-
-        .subtitle {
-            color: var(--text-muted);
-            font-size: 1.1rem;
-        }
-
-        .input-group {
             margin-bottom: 2rem;
-            position: relative;
+            color: #fff;
+        }
+
+        .brand i {
+            color: var(--primary);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
         }
 
         label {
             display: block;
-            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
             color: var(--text-muted);
-            margin-bottom: 0.8rem;
+            font-size: 0.875rem;
             font-weight: 500;
         }
 
-        .input-wrapper {
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
-
-        .input-wrapper i {
-            position: absolute;
-            left: 16px;
-            color: var(--text-muted);
-            font-size: 1.2rem;
-            transition: color 0.3s;
-        }
-
-        input,
+        input[type="text"],
         select {
             width: 100%;
-            background: rgba(0, 0, 0, 0.2);
+            background: var(--bg);
             border: 1px solid var(--border);
-            padding: 16px 16px 16px 48px;
-            border-radius: 12px;
             color: #fff;
-            font-size: 1rem;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        /* Select styling adjustment */
-        select {
-            appearance: none;
-            cursor: pointer;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' style='fill: rgba(148, 163, 184, 1);'%3E%3Cpath d='M16.293 9.293 12 13.586 7.707 9.293l-1.414 1.414L12 16.414l5.707-5.707z'%3E%3C/path%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 16px center;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: 0.2s border;
         }
 
         input:focus,
         select:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
-            background: rgba(0, 0, 0, 0.4);
         }
 
-        input:focus+i {
-            color: var(--primary);
-        }
-
-        .action-row {
+        .toggle-group {
             display: flex;
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-
-        button {
-            width: 100%;
-            padding: 18px;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-            border: none;
-            border-radius: 12px;
-            color: white;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-            letter-spacing: 0.02em;
-            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
-        }
-
-        button::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: 0.5s;
-        }
-
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
-        }
-
-        button:hover::after {
-            left: 100%;
-        }
-
-        button:disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        /* Results Area */
-        #output-card {
-            margin-top: 3rem;
-            display: none;
-            animation: slideUp 0.5s ease forwards;
-        }
-
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .output-header {
-            display: flex;
-            justify-content: space-between;
             align-items: center;
-            margin-bottom: 1rem;
-            padding-bottom: 1rem;
+            justify-content: space-between;
+            padding: 0.75rem 0;
             border-bottom: 1px solid var(--border);
         }
 
-        .output-title {
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--surface-hover);
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked+.slider {
+            background-color: var(--primary);
+        }
+
+        input:checked+.slider:before {
+            transform: translateX(20px);
+        }
+
+        .btn-generate {
+            width: 100%;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 8px;
             font-weight: 600;
-            color: #fff;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
             display: flex;
             align-items: center;
-            gap: 8px;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
         }
 
-        .copy-btn {
+        .btn-generate:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-generate:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        /* Main Content */
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            height: 100%;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .actions-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--surface);
+            padding: 1rem;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            z-index: 20;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .tab-btn {
             background: transparent;
-            width: auto;
-            padding: 8px 12px;
-            font-size: 0.9rem;
-            box-shadow: none;
-            border: 1px solid var(--border);
+            border: 1px solid transparent;
             color: var(--text-muted);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-weight: 500;
         }
 
-        .copy-btn:hover {
-            background: rgba(255, 255, 255, 0.05);
+        .tab-btn.active {
+            background: var(--surface-hover);
             color: #fff;
-            transform: none;
-            box-shadow: none;
+            border-color: var(--border);
         }
 
-        #output-content {
-            background: #0d1117;
-            /* GitHub dark dim */
-            padding: 1.5rem;
-            border-radius: 12px;
-            color: #e6edf3;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.9rem;
-            line-height: 1.6;
-            white-space: pre-wrap;
-            max-height: 600px;
-            overflow-y: auto;
+        .tool-btn {
+            background: var(--bg);
             border: 1px solid var(--border);
+            color: var(--text);
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.2s;
         }
 
-        /* Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
+        .tool-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
         }
 
-        ::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.1);
+        .output-container {
+            flex-grow: 1;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            position: relative;
+            overflow: hidden;
+            z-index: 10;
         }
 
-        ::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 4px;
+        /* Views */
+        .view-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            overflow-y: auto;
+            padding: 2rem;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s;
+            background: var(--surface);
+            width: 100%;
+            height: 100%;
         }
 
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(255, 255, 255, 0.2);
+        .view-layer.active {
+            opacity: 1;
+            visibility: visible;
+            z-index: 5;
         }
 
-        /* Loader */
-        .loader-container {
+        .code-view {
+            font-family: 'JetBrains Mono', monospace;
+            white-space: pre-wrap;
+            color: #d4d4d8;
+            font-size: 0.9rem;
+        }
+
+        .preview-view {
+            color: #d4d4d8;
+            line-height: 1.6;
+        }
+
+        .preview-view h1,
+        .preview-view h2 {
+            color: #fff;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .preview-view h1:first-child {
+            margin-top: 0;
+        }
+
+        .preview-view a {
+            color: var(--primary);
+        }
+
+        /* Loader & Visualizer */
+        .loader-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #000;
             display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+        }
+
+        canvas#neural-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.6;
+        }
+
+        .loader-content {
+            position: relative;
+            z-index: 55;
             text-align: center;
-            margin-top: 2rem;
+            background: rgba(9, 9, 11, 0.7);
+            padding: 2rem;
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            max-width: 400px;
+            width: 90%;
         }
 
         .spinner {
-            width: 50px;
-            height: 50px;
-            border: 3px solid rgba(59, 130, 246, 0.1);
-            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(139, 92, 246, 0.3);
             border-top-color: var(--primary);
-            animation: spin 1s ease-in-out infinite;
-            margin: 0 auto 1rem;
+            border-radius: 50%;
+            animation: spin 1s infinite linear;
+            margin: 0 auto 1.5rem;
         }
 
         @keyframes spin {
-            to {
+            100% {
                 transform: rotate(360deg);
             }
         }
 
-        .status-text {
-            color: var(--text-muted);
-            font-size: 0.9rem;
-            letter-spacing: 0.5px;
-            animation: pulse 2s infinite;
+        .phase-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 0.5rem;
         }
 
-        @keyframes pulse {
+        .phase-log {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--primary);
+            min-height: 1.4em;
+        }
 
-            0%,
-            100% {
-                opacity: 0.6;
+        .file-scroller {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 1rem;
+            height: 100px;
+            overflow: hidden;
+            text-align: left;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 1rem;
+            opacity: 0.7;
+            position: relative;
+        }
+
+        .file-scroller::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 40px;
+            background: linear-gradient(to bottom, transparent, rgba(9, 9, 11, 0.9));
+        }
+
+        .file-entry {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            line-height: 1.5;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-10px);
             }
 
-            50% {
+            to {
                 opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @media (max-width: 900px) {
+            .app-container {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+
+            .sidebar {
+                height: auto;
+            }
+
+            .output-container {
+                min-height: 600px;
             }
         }
     </style>
@@ -354,135 +447,344 @@
 
 <body>
 
-    <div class="container">
-        <div class="header">
-            <div class="logo-badge">
-                <i class='bx bxs-bot'></i> V2.0 Beta
+    <div class="app-container">
+        <!-- Config Panel -->
+        <div class="sidebar">
+            <div class="brand">
+                <i class='bx bxs-bot'></i> DocSage <span
+                    style="font-size:0.8rem; background: var(--surface-hover); padding: 2px 6px; border-radius: 4px; border: 1px solid var(--border); color: var(--text-muted);">PRO</span>
             </div>
-            <h1>DocSage API</h1>
-            <p class="subtitle">AI-Powered Documentation Generator for Any Repository</p>
-        </div>
 
-        <div class="input-group">
-            <label>GitHub Repository URL</label>
-            <div class="input-wrapper">
-                <i class='bx bxl-github'></i>
-                <input type="text" id="repoUrl" placeholder="https://github.com/username/project"
-                    value="https://github.com/nestjs/typescript-starter" autocomplete="off">
+            <div class="form-group">
+                <label>GitHub Repository</label>
+                <input type="text" id="repoUrl" placeholder="https://github.com/..."
+                    value="https://github.com/nestjs/typescript-starter">
             </div>
-        </div>
 
-        <div class="input-group">
-            <label>Output Tone</label>
-            <div class="input-wrapper">
-                <i class='bx bx-equalizer'></i>
+            <div class="form-group">
+                <label>Author Alias</label>
+                <input type="text" id="author" placeholder="Default: Repo Owner">
+            </div>
+
+            <div class="form-group">
+                <label>Documentation Style</label>
                 <select id="style">
                     <option value="Professional">Professional (Standard)</option>
-                    <option value="Casual">Casual (Friendly)</option>
-                    <option value="Technical">Technical (Deep Dive)</option>
+                    <option value="Casual">Casual & Friendly</option>
+                    <option value="Technical">Technical Deep Dive</option>
+                    <option value="Minimalist">Minimalist</option>
                 </select>
             </div>
-        </div>
 
-        <button id="generateBtn" onclick="generateDocs()">
-            <i class='bx bxs-magic-wand' style="margin-right: 8px;"></i> Generate Documentation
-        </button>
-
-        <div class="loader-container" id="loader">
-            <div class="spinner"></div>
-            <p class="status-text">Analyzing codebase & generating insights...</p>
-        </div>
-
-        <div id="output-card">
-            <div class="output-header">
-                <div class="output-title">
-                    <i class='bx bxs-file-md'></i> README.md
-                </div>
-                <button class="copy-btn" onclick="copyToClipboard()">
-                    <i class='bx bx-copy'></i> Copy
-                </button>
+            <div class="toggle-group">
+                <label style="margin:0">Include Badges</label>
+                <label class="switch">
+                    <input type="checkbox" id="includeBadges" checked>
+                    <span class="slider"></span>
+                </label>
             </div>
-            <div id="output-content"></div>
+
+            <button class="btn-generate" onclick="generateDocs()" id="generateBtn">
+                <i class='bx bxs-magic-wand'></i> Analyz & Generate
+            </button>
+
+            <div style="flex-grow: 1"></div>
+
+            <div style="margin-top: 2rem; border-top: 1px solid var(--border); padding-top: 1rem;">
+                <label><i class='bx bx-history'></i> Recent Scans</label>
+                <div id="history-list" style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem;">
+                    <!-- History -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Output Area -->
+        <div class="main-content">
+            <div class="actions-bar">
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="switchTab('preview')"><i class='bx bx-show'></i>
+                        Preview</button>
+                    <button class="tab-btn" onclick="switchTab('code')"><i class='bx bx-code-alt'></i> Markdown</button>
+                </div>
+                <div style="display:flex; gap: 0.5rem;">
+                    <button class="tool-btn" onclick="copyDocs()" title="Copy Markdown"><i
+                            class='bx bx-copy'></i></button>
+                    <button class="tool-btn" onclick="downloadDocs()" title="Download File"><i
+                            class='bx bx-download'></i></button>
+                </div>
+            </div>
+
+            <div class="output-container">
+                <!-- Advanced Loader -->
+                <div class="loader-overlay" id="loader">
+                    <canvas id="neural-canvas"></canvas>
+                    <div class="loader-content">
+                        <div class="spinner"></div>
+                        <div class="phase-title" id="phase-title">Initializing System</div>
+                        <div class="phase-log" id="phase-log">Establishing connection...</div>
+                        <div class="file-scroller" id="file-scroller">
+                            <!-- Simulated file logs -->
+                        </div>
+                    </div>
+                </div>
+
+                <div id="preview-view" class="view-layer preview-view active">
+                    <div
+                        style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: var(--text-muted); text-align: center;">
+                        <i class='bx bxs-terminal' style="font-size: 4rem; margin-bottom: 1rem; opacity: 0.2"></i>
+                        <h3>Ready to Generate</h3>
+                        <p style="max-width: 300px; margin-top: 0.5rem;">Enter a repository URL to start the deep
+                            analysis engine.</p>
+                    </div>
+                </div>
+                <div id="code-view" class="view-layer code-view"></div>
+            </div>
         </div>
     </div>
 
     <script>
-        async function generateDocs() {
-            const repoUrl = document.getElementById('repoUrl').value;
-            const style = document.getElementById('style').value;
-            const btn = document.getElementById('generateBtn');
-            const loader = document.getElementById('loader');
-            const outputCard = document.getElementById('output-card');
-            const outputContent = document.getElementById('output-content');
-            const statusText = document.querySelector('.status-text');
+        let currentMarkdown = '';
+        let simulationInterval;
+        let canvasAnimationId;
 
-            if (!repoUrl) {
-                // Shake animation or toast could go here
-                alert('Please enter a valid GitHub URL');
-                return;
+        // --- Neural Visualization Logic ---
+        const canvas = document.getElementById('neural-canvas');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+        let nodes = [];
+
+        function resizeCanvas() {
+            width = canvas.width = canvas.parentElement.offsetWidth;
+            height = canvas.height = canvas.parentElement.offsetHeight;
+        }
+
+        class Node {
+            constructor() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.vx = (Math.random() - 0.5) * 1.5;
+                this.vy = (Math.random() - 0.5) * 1.5;
+                this.radius = Math.random() * 2 + 1;
             }
 
-            // Reset State
-            btn.disabled = true;
-            btn.innerHTML = 'Processing...';
-            loader.style.display = 'block';
-            outputCard.style.display = 'none';
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                if (this.x < 0 || this.x > width) this.vx *= -1;
+                if (this.y < 0 || this.y > height) this.vy *= -1;
+            }
 
-            // Fun loading messages
-            const messages = [
-                "Cloning repository...",
-                "Scanning AST nodes...",
-                "Analyzing dependencies...",
-                "Consulting AI models...",
-                "Drafting README..."
-            ];
-            let msgIdx = 0;
-            const msgInterval = setInterval(() => {
-                statusText.textContent = messages[msgIdx % messages.length];
-                msgIdx++;
-            }, 3000);
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = '#8b5cf6';
+                ctx.fill();
+            }
+        }
+
+        function initVisualizer() {
+            resizeCanvas();
+            nodes = [];
+            for (let i = 0; i < 40; i++) nodes.push(new Node());
+            animateNetwork();
+        }
+
+        function animateNetwork() {
+            ctx.clearRect(0, 0, width, height);
+
+            // Update & Draw Nodes
+            nodes.forEach(node => {
+                node.update();
+                node.draw();
+            });
+
+            // Draw Connections
+            ctx.strokeStyle = 'rgba(139, 92, 246, 0.15)';
+            ctx.lineWidth = 1;
+            for (let i = 0; i < nodes.length; i++) {
+                for (let j = i + 1; j < nodes.length; j++) {
+                    const dx = nodes[i].x - nodes[j].x;
+                    const dy = nodes[i].y - nodes[j].y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+
+                    if (dist < 100) {
+                        ctx.beginPath();
+                        ctx.moveTo(nodes[i].x, nodes[i].y);
+                        ctx.lineTo(nodes[j].x, nodes[j].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+            canvasAnimationId = requestAnimationFrame(animateNetwork);
+        }
+
+        // --- Core Logic ---
+        loadHistory();
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            if (tab === 'preview') {
+                document.querySelector('.tab-btn:first-child').classList.add('active');
+            } else {
+                document.querySelector('.tab-btn:last-child').classList.add('active');
+            }
+
+            document.querySelectorAll('.view-layer').forEach(v => v.classList.remove('active'));
+            document.getElementById(tab + '-view').classList.add('active');
+        }
+
+        async function generateDocs() {
+            const repoUrl = document.getElementById('repoUrl').value;
+            const author = document.getElementById('author').value;
+            const style = document.getElementById('style').value;
+            const includeBadges = document.getElementById('includeBadges').checked;
+
+            if (!repoUrl) return alert('Please enter a URL');
+
+            startSimulation();
+            addToHistory(repoUrl);
 
             try {
-                // Use the production Render URL as requested by user previously
                 const API_URL = 'https://docsagev2.onrender.com/api/generate-docs';
 
                 const response = await fetch(API_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ repoUrl, style })
+                    body: JSON.stringify({ repoUrl, author, style, includeBadges })
                 });
 
                 const data = await response.json();
 
-                if (data.success) {
-                    outputCard.style.display = 'block';
-                    outputContent.textContent = data.markdown;
-                    // Auto scroll to result
-                    outputCard.scrollIntoView({ behavior: 'smooth' });
-                } else {
-                    throw new Error(data.error || 'Generation failed');
-                }
+                if (!data.success) throw new Error(data.error || 'Failed');
 
-            } catch (error) {
-                alert('Detailed Error: ' + error.message);
+                currentMarkdown = data.markdown;
+                renderOutput();
+                switchTab('preview');
+
+            } catch (err) {
+                alert('Error: ' + err.message);
             } finally {
-                clearInterval(msgInterval);
-                btn.disabled = false;
-                btn.innerHTML = '<i class="bx bxs-magic-wand" style="margin-right: 8px;"></i> Generate Documentation';
-                loader.style.display = 'none';
+                stopSimulation();
             }
         }
 
-        function copyToClipboard() {
-            const content = document.getElementById('output-content').textContent;
-            navigator.clipboard.writeText(content).then(() => {
-                const btn = document.querySelector('.copy-btn');
-                const originalText = btn.innerHTML;
-                btn.innerHTML = '<i class="bx bx-check"></i> Copied!';
-                setTimeout(() => btn.innerHTML = originalText, 2000);
-            });
+        function renderOutput() {
+            document.getElementById('code-view').textContent = currentMarkdown;
+            const cleanHtml = DOMPurify.sanitize(marked.parse(currentMarkdown));
+            document.getElementById('preview-view').innerHTML = cleanHtml;
         }
+
+        // --- High-Fidelity Simulator ---
+        function startSimulation() {
+            document.getElementById('loader').style.display = 'flex';
+            document.getElementById('generateBtn').disabled = true;
+
+            initVisualizer();
+
+            const fileScroller = document.getElementById('file-scroller');
+            const phaseTitle = document.getElementById('phase-title');
+            const phaseLog = document.getElementById('phase-log');
+            fileScroller.innerHTML = '';
+
+            const realisticFiles = [
+                'src/index.ts', 'package.json', 'README.md', 'src/controllers/auth.ts',
+                'src/services/db.service.ts', '.gitignore', 'docker-compose.yml', 'tsconfig.json',
+                'src/utils/logger.ts', 'src/middleware/cors.ts', 'public/index.html',
+                'src/types/express.d.ts', 'tests/unit/app.spec.ts', '.env.example'
+            ];
+
+            let phase = 'clone';
+            let ticks = 0;
+
+            simulationInterval = setInterval(() => {
+                ticks++;
+
+                // Phase Management
+                if (ticks < 10) {
+                    phase = 'clone';
+                    phaseTitle.textContent = "Cloning Repository";
+                    phaseLog.textContent = `git clone --depth 1 ...`;
+                } else if (ticks < 30) {
+                    phase = 'scan';
+                    phaseTitle.textContent = "Analyzing Codebase";
+                    phaseLog.textContent = `Building Dependency Graph...`;
+
+                    // Add simulated files
+                    if (Math.random() > 0.3) {
+                        const file = realisticFiles[Math.floor(Math.random() * realisticFiles.length)];
+                        const div = document.createElement('div');
+                        div.className = 'file-entry';
+                        div.innerHTML = `<span style="color:#52525b">SCAN</span> ${file} <span style="color:#71717a; float:right">${Math.floor(Math.random() * 500)}B</span>`;
+                        fileScroller.prepend(div);
+                        if (fileScroller.children.length > 5) fileScroller.lastElementChild.remove();
+                    }
+
+                    // Add more nodes to graph
+                    if (nodes.length < 80 && ticks % 2 === 0) nodes.push(new Node());
+                } else if (ticks < 50) {
+                    phase = 'ast';
+                    phaseTitle.textContent = "Parsing AST Nodes";
+                    phaseLog.textContent = "Extracting Symbols & Interfaces...";
+                } else {
+                    phase = 'ai';
+                    phaseTitle.textContent = "Generating Documentation";
+                    phaseLog.textContent = "Consulting Gemini 2.5 Flash Model...";
+                }
+            }, 300);
+        }
+
+        function stopSimulation() {
+            clearInterval(simulationInterval);
+            cancelAnimationFrame(canvasAnimationId);
+            document.getElementById('loader').style.display = 'none';
+            document.getElementById('generateBtn').disabled = false;
+        }
+
+        function copyDocs() {
+            if (!currentMarkdown) return;
+            navigator.clipboard.writeText(currentMarkdown);
+            const btn = document.querySelector('.tool-btn i.bx-copy').parentElement;
+            btn.style.color = '#10b981';
+            setTimeout(() => btn.style.color = '', 1000);
+        }
+
+        function downloadDocs() {
+            if (!currentMarkdown) return;
+            const blob = new Blob([currentMarkdown], { type: 'text/markdown' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'README.md';
+            a.click();
+        }
+
+        // History
+        function addToHistory(url) {
+            let history = JSON.parse(localStorage.getItem('docsage_history') || '[]');
+            if (!history.includes(url)) {
+                history.unshift(url);
+                if (history.length > 5) history.pop();
+                localStorage.setItem('docsage_history', JSON.stringify(history));
+                loadHistory();
+            }
+        }
+
+        function loadHistory() {
+            const history = JSON.parse(localStorage.getItem('docsage_history') || '[]');
+            const container = document.getElementById('history-list');
+            container.innerHTML = history.map(url => `
+            <div style="font-size: 0.85rem; color: var(--primary); cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 4px 8px; border-radius: 4px; transition: 0.2s;" 
+                 onmouseover="this.style.background='var(--surface-hover)'"
+                 onmouseout="this.style.background='transparent'"
+                 onclick="document.getElementById('repoUrl').value='${url}'">
+                <i class='bx bx-git-branch'></i> ${url.split('/').slice(-2).join('/')}
+            </div>
+        `).join('');
+        }
+
+        window.addEventListener('resize', resizeCanvas);
     </script>
+
 </body>
 
 </html>

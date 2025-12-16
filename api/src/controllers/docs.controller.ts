@@ -7,7 +7,7 @@ import { GitService } from '../../../src/services/git-service.js';
 import { logger } from '../../../src/utils/logger.js';
 
 export const generateDocs = async (req: Request, res: Response) => {
-    const { repoUrl, style = 'Professional' } = req.body;
+    const { repoUrl, style = 'Professional', author, includeBadges = true } = req.body;
     const apiKey = process.env.GEMINI_API_KEY;
 
     if (!repoUrl) {
@@ -41,7 +41,8 @@ export const generateDocs = async (req: Request, res: Response) => {
 
         const readme = await gemini.generateReadmeAdvanced(repoName, analysis, {
             style,
-            includeBadges: true
+            includeBadges,
+            author
         });
 
         // 5. Cleanup & Respond

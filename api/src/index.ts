@@ -12,8 +12,54 @@ app.use(cors());
 app.use(express.json());
 
 // Health check
+// Health check (Keep-alive target)
 app.get('/', (req, res) => {
     res.send('DocSage v2 API is running 🚀');
+});
+
+// Detailed Diagnostic Health Check
+app.get('/api/health', async (req, res) => {
+    const diagnostics: any = {
+        status: 'ok',
+        timestamp: new Date().toISOString(),
+        env: {
+            nodeVersion: process.version,
+            hasApiKey: !!process.env.GEMINI_API_KEY
+        }
+    };
+
+    // Check Git
+    try {
+        const { spawnSync } = await import('child_process');
+        const gitCheck = spawnSync('git', ['--version']);
+        diagnostics.git = {
+            available: gitCheck.error ? false : true,
+            version: gitCheck.stdout?.toString().trim() || 'unknown'
+        };
+    } catch (e: any) {
+        diagnostics.git = { available: false, error: e.message };
+    }
+
+    // Check Write Access
+    try {
+        const fs = await import('fs/promises');
+        const os = await import('os');
+        const path = await import('path');
+        const testFile = path.join(os.tmpdir(), 'health-check.tmp');
+        await fs.writeFile(testFile, 'ok');
+        await fs.unlink(testFile);
+        diagnostics.filesystem = { writable: true, tmpDir: os.tmpdir() };
+    } catch (e: any) {
+        diagnostics.filesystem = { writable: false, error: e.message };
+        diagnostics.status = 'degraded';
+    }
+
+    if (!diagnostics.env.hasApiKey || !diagnostics.git.available) {
+        diagnostics.status = 'error';
+        return res.status(500).json(diagnostics);
+    }
+
+    res.json(diagnostics);
 });
 
 // Generate Docs Endpoint
