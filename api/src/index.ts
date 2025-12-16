@@ -84,6 +84,20 @@ setTimeout(pingKeepAlive, 10000);
 // Ping every 10 minutes
 setInterval(pingKeepAlive, 10 * 60 * 1000);
 
+app.get('/api/generate-docs', (req, res) => {
+    res.send(`
+        <html>
+            <body style="background:#09090b; color:#e4e4e7; font-family:sans-serif; height:100vh; display:flex; align-items:center; justify-content:center; text-align:center;">
+                <div>
+                    <h1>⚠️ Method Not Allowed</h1>
+                    <p>You cannot visit this URL directly in the browser (GET request).</p>
+                    <p>Please use the <a href="/test.html" style="color:#8b5cf6">Test Page</a> or send a POST request.</p>
+                </div>
+            </body>
+        </html>
+    `);
+});
+
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });

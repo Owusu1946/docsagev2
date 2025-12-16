@@ -12,8 +12,18 @@
         href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap"
         rel="stylesheet">
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+
+    <!-- Marked & DomPurify -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/dompurify/dist/purify.min.js"></script>
+
+    <!-- Highlight.js -->
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/typescript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/json.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
 
     <style>
         :root {
@@ -43,7 +53,6 @@
             padding: 2rem;
             gap: 2rem;
             overflow: hidden;
-            /* Prevent scroll during canvas animation */
         }
 
         /* Layout */
@@ -296,6 +305,7 @@
             font-size: 0.9rem;
         }
 
+        /* Preview View Styling */
         .preview-view {
             color: #d4d4d8;
             line-height: 1.6;
@@ -315,6 +325,46 @@
 
         .preview-view a {
             color: var(--primary);
+        }
+
+        .preview-view code {
+            background: #27272a;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono';
+            font-size: 0.85em;
+        }
+
+        /* Highlight.js Override */
+        .preview-view pre {
+            background: #1e1e1e !important;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            overflow-x: auto;
+        }
+
+        .preview-view pre code {
+            background: transparent !important;
+            padding: 0;
+            font-family: 'JetBrains Mono';
+        }
+
+        .preview-view table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        .preview-view th,
+        .preview-view td {
+            border: 1px solid var(--border);
+            padding: 0.75rem;
+            text-align: left;
+        }
+
+        .preview-view th {
+            background: var(--surface-hover);
         }
 
         /* Loader & Visualizer */
@@ -426,6 +476,34 @@
                 opacity: 1;
                 transform: translateX(0);
             }
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--surface-hover);
+            color: #fff;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            transform: translateY(150%);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 100;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+        }
+
+        .toast i {
+            color: var(--success);
+            font-size: 1.2rem;
         }
 
         @media (max-width: 900px) {
@@ -542,6 +620,12 @@
         </div>
     </div>
 
+    <!-- Toast -->
+    <div class="toast" id="toast">
+        <i class='bx bxs-check-circle'></i>
+        <span>Copied to clipboard!</span>
+    </div>
+
     <script>
         let currentMarkdown = '';
         let simulationInterval;
@@ -554,6 +638,7 @@
         let nodes = [];
 
         function resizeCanvas() {
+            if (!canvas.parentElement) return;
             width = canvas.width = canvas.parentElement.offsetWidth;
             height = canvas.height = canvas.parentElement.offsetHeight;
         }
@@ -639,7 +724,7 @@
             const style = document.getElementById('style').value;
             const includeBadges = document.getElementById('includeBadges').checked;
 
-            if (!repoUrl) return alert('Please enter a URL');
+            if (!repoUrl) return showToast('Please enter a URL', true);
 
             startSimulation();
             addToHistory(repoUrl);
@@ -655,14 +740,18 @@
 
                 const data = await response.json();
 
-                if (!data.success) throw new Error(data.error || 'Failed');
+                if (!data.success) {
+                    if (data.stack) console.error(data.stack);
+                    throw new Error(data.error || 'Failed');
+                }
 
                 currentMarkdown = data.markdown;
                 renderOutput();
                 switchTab('preview');
 
             } catch (err) {
-                alert('Error: ' + err.message);
+                alert('Error: ' + err.message); // Keep alert for errors, or use advanced toast? Simple is fine for error
+                console.error(err);
             } finally {
                 stopSimulation();
             }
@@ -672,6 +761,11 @@
             document.getElementById('code-view').textContent = currentMarkdown;
             const cleanHtml = DOMPurify.sanitize(marked.parse(currentMarkdown));
             document.getElementById('preview-view').innerHTML = cleanHtml;
+
+            // Syntax Highlight
+            document.querySelectorAll('pre code').forEach((block) => {
+                hljs.highlightElement(block);
+            });
         }
 
         // --- High-Fidelity Simulator ---
@@ -700,16 +794,17 @@
                 ticks++;
 
                 // Phase Management
-                if (ticks < 10) {
-                    phase = 'clone';
+                // Speed up phase management for better UX in "mock" mode, 
+                // but in real API it waits for response. 
+                // Let's just loop status messages until complete
+
+                if (ticks < 15) {
                     phaseTitle.textContent = "Cloning Repository";
                     phaseLog.textContent = `git clone --depth 1 ...`;
-                } else if (ticks < 30) {
-                    phase = 'scan';
+                } else if (ticks < 40) {
                     phaseTitle.textContent = "Analyzing Codebase";
                     phaseLog.textContent = `Building Dependency Graph...`;
 
-                    // Add simulated files
                     if (Math.random() > 0.3) {
                         const file = realisticFiles[Math.floor(Math.random() * realisticFiles.length)];
                         const div = document.createElement('div');
@@ -718,19 +813,13 @@
                         fileScroller.prepend(div);
                         if (fileScroller.children.length > 5) fileScroller.lastElementChild.remove();
                     }
-
-                    // Add more nodes to graph
                     if (nodes.length < 80 && ticks % 2 === 0) nodes.push(new Node());
-                } else if (ticks < 50) {
-                    phase = 'ast';
-                    phaseTitle.textContent = "Parsing AST Nodes";
-                    phaseLog.textContent = "Extracting Symbols & Interfaces...";
+
                 } else {
-                    phase = 'ai';
                     phaseTitle.textContent = "Generating Documentation";
                     phaseLog.textContent = "Consulting Gemini 2.5 Flash Model...";
                 }
-            }, 300);
+            }, 200);
         }
 
         function stopSimulation() {
@@ -743,9 +832,7 @@
         function copyDocs() {
             if (!currentMarkdown) return;
             navigator.clipboard.writeText(currentMarkdown);
-            const btn = document.querySelector('.tool-btn i.bx-copy').parentElement;
-            btn.style.color = '#10b981';
-            setTimeout(() => btn.style.color = '', 1000);
+            showToast('Copied Markdown to clipboard!');
         }
 
         function downloadDocs() {
@@ -756,6 +843,20 @@
             a.href = url;
             a.download = 'README.md';
             a.click();
+            showToast('Download started');
+        }
+
+        function showToast(msg, isError = false) {
+            const toast = document.getElementById('toast');
+            const icon = toast.querySelector('i');
+            const span = toast.querySelector('span');
+
+            icon.className = isError ? 'bx bxs-error-circle' : 'bx bxs-check-circle';
+            icon.style.color = isError ? '#ef4444' : '#10b981';
+            span.textContent = msg;
+
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
         }
 
         // History
@@ -770,8 +871,8 @@
         }
 
         function loadHistory() {
-            const history = JSON.parse(localStorage.getItem('docsage_history') || '[]');
             const container = document.getElementById('history-list');
+            const history = JSON.parse(localStorage.getItem('docsage_history') || '[]');
             container.innerHTML = history.map(url => `
             <div style="font-size: 0.85rem; color: var(--primary); cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 4px 8px; border-radius: 4px; transition: 0.2s;" 
                  onmouseover="this.style.background='var(--surface-hover)'"
