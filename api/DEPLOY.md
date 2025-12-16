@@ -33,8 +33,8 @@ Render is robust and does not have the execution timeout limits of Vercel Free T
 ### Method B: Manual Web Service
 1.  Create **Web Service**.
 2.  **Root Directory**: `api`
-3.  **Build Command**: `npm install && npm run build`
-4.  **Start Command**: `npm run start:prod`
+3.  **Build Command**: `npm install && npm run build` (CRITICAL: Do not just use `npm install`)
+4.  **Start Command**: `npm run start:prod` (CRITICAL: Do not use `npm start`)
 5.  **Env Vars**: `GEMINI_API_KEY`
 
 ## Testing Deployment
