@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DocSage API</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+    <!-- Icons -->
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-color: #0f1115;
+            --card-bg: rgba(22, 25, 30, 0.7);
+            --primary: #3b82f6;
+            --primary-glow: rgba(59, 130, 246, 0.5);
+            --accent: #8b5cf6;
+            --text-main: #ffffff;
+            --text-muted: #94a3b8;
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image:
+                radial-gradient(circle at 0% 0%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 100% 100%, rgba(139, 92, 246, 0.15) 0%, transparent 50%);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        /* Glassmorphism Container */
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            padding: 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Decorative blobs */
+        .container::before {
+            content: '';
+            position: absolute;
+            top: -100px;
+            right: -100px;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, var(--primary-glow) 0%, transparent 70%);
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .logo-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            padding: 6px 16px;
+            border-radius: 20px;
+            color: var(--primary);
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.05em;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        .input-group {
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        label {
+            display: block;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 0.8rem;
+            font-weight: 500;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-wrapper i {
+            position: absolute;
+            left: 16px;
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            transition: color 0.3s;
+        }
+
+        input,
+        select {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border);
+            padding: 16px 16px 16px 48px;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 1rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Select styling adjustment */
+        select {
+            appearance: none;
+            cursor: pointer;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' style='fill: rgba(148, 163, 184, 1);'%3E%3Cpath d='M16.293 9.293 12 13.586 7.707 9.293l-1.414 1.414L12 16.414l5.707-5.707z'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+            background: rgba(0, 0, 0, 0.4);
+        }
+
+        input:focus+i {
+            color: var(--primary);
+        }
+
+        .action-row {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        button {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            letter-spacing: 0.02em;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        }
+
+        button::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+        }
+
+        button:hover::after {
+            left: 100%;
+        }
+
+        button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Results Area */
+        #output-card {
+            margin-top: 3rem;
+            display: none;
+            animation: slideUp 0.5s ease forwards;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .output-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .output-title {
+            font-weight: 600;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .copy-btn {
+            background: transparent;
+            width: auto;
+            padding: 8px 12px;
+            font-size: 0.9rem;
+            box-shadow: none;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+        }
+
+        .copy-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            transform: none;
+            box-shadow: none;
+        }
+
+        #output-content {
+            background: #0d1117;
+            /* GitHub dark dim */
+            padding: 1.5rem;
+            border-radius: 12px;
+            color: #e6edf3;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            max-height: 600px;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Loader */
+        .loader-container {
+            display: none;
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(59, 130, 246, 0.1);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s ease-in-out infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .status-text {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            letter-spacing: 0.5px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 0.6;
+            }
+
+            50% {
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="header">
+            <div class="logo-badge">
+                <i class='bx bxs-bot'></i> V2.0 Beta
+            </div>
+            <h1>DocSage API</h1>
+            <p class="subtitle">AI-Powered Documentation Generator for Any Repository</p>
+        </div>
+
+        <div class="input-group">
+            <label>GitHub Repository URL</label>
+            <div class="input-wrapper">
+                <i class='bx bxl-github'></i>
+                <input type="text" id="repoUrl" placeholder="https://github.com/username/project"
+                    value="https://github.com/nestjs/typescript-starter" autocomplete="off">
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label>Output Tone</label>
+            <div class="input-wrapper">
+                <i class='bx bx-equalizer'></i>
+                <select id="style">
+                    <option value="Professional">Professional (Standard)</option>
+                    <option value="Casual">Casual (Friendly)</option>
+                    <option value="Technical">Technical (Deep Dive)</option>
+                </select>
+            </div>
+        </div>
+
+        <button id="generateBtn" onclick="generateDocs()">
+            <i class='bx bxs-magic-wand' style="margin-right: 8px;"></i> Generate Documentation
+        </button>
+
+        <div class="loader-container" id="loader">
+            <div class="spinner"></div>
+            <p class="status-text">Analyzing codebase & generating insights...</p>
+        </div>
+
+        <div id="output-card">
+            <div class="output-header">
+                <div class="output-title">
+                    <i class='bx bxs-file-md'></i> README.md
+                </div>
+                <button class="copy-btn" onclick="copyToClipboard()">
+                    <i class='bx bx-copy'></i> Copy
+                </button>
+            </div>
+            <div id="output-content"></div>
+        </div>
+    </div>
+
+    <script>
+        async function generateDocs() {
+            const repoUrl = document.getElementById('repoUrl').value;
+            const style = document.getElementById('style').value;
+            const btn = document.getElementById('generateBtn');
+            const loader = document.getElementById('loader');
+            const outputCard = document.getElementById('output-card');
+            const outputContent = document.getElementById('output-content');
+            const statusText = document.querySelector('.status-text');
+
+            if (!repoUrl) {
+                // Shake animation or toast could go here
+                alert('Please enter a valid GitHub URL');
+                return;
+            }
+
+            // Reset State
+            btn.disabled = true;
+            btn.innerHTML = 'Processing...';
+            loader.style.display = 'block';
+            outputCard.style.display = 'none';
+
+            // Fun loading messages
+            const messages = [
+                "Cloning repository...",
+                "Scanning AST nodes...",
+                "Analyzing dependencies...",
+                "Consulting AI models...",
+                "Drafting README..."
+            ];
+            let msgIdx = 0;
+            const msgInterval = setInterval(() => {
+                statusText.textContent = messages[msgIdx % messages.length];
+                msgIdx++;
+            }, 3000);
+
+            try {
+                // Use the production Render URL as requested by user previously
+                const API_URL = 'https://docsagev2.onrender.com/api/generate-docs';
+
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ repoUrl, style })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    outputCard.style.display = 'block';
+                    outputContent.textContent = data.markdown;
+                    // Auto scroll to result
+                    outputCard.scrollIntoView({ behavior: 'smooth' });
+                } else {
+                    throw new Error(data.error || 'Generation failed');
+                }
+
+            } catch (error) {
+                alert('Detailed Error: ' + error.message);
+            } finally {
+                clearInterval(msgInterval);
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bx bxs-magic-wand" style="margin-right: 8px;"></i> Generate Documentation';
+                loader.style.display = 'none';
+            }
+        }
+
+        function copyToClipboard() {
+            const content = document.getElementById('output-content').textContent;
+            navigator.clipboard.writeText(content).then(() => {
+                const btn = document.querySelector('.copy-btn');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '<i class="bx bx-check"></i> Copied!';
+                setTimeout(() => btn.innerHTML = originalText, 2000);
+            });
+        }
+    </script>
+</body>
+
+</html>

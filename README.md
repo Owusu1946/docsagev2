@@ -63,6 +63,7 @@ DocSage v2 offers a robust set of features designed to make documentation genera
 | **Developer Experience** | Command-Line Interface (CLI)                   | Provides a straightforward and intuitive command-line interface (`src/bin/cli.ts`) for easy execution and interaction. Users can initiate documentation generation with simple commands.                                                                                                                                                                                              |
 |                         | Integrated Logging                             | Incorporates a centralized logging utility (`src/utils/logger.ts`) to provide clear feedback during the documentation generation process, indicating progress, warnings, and errors directly to the user.                                                                                                                                                                             |
 |                         | **New! Remote Repo Analysis**                  | Generate documentation for ANY public GitHub repository without manual cloning. Simply run `docsage <repo-url>` to analyze, generate, and save the README locally.                                                                                                                                                                                                           |
+| **For Developers**      | **REST API**                                   | A fully functional Express.js API (`/api/generate-docs`) is available to integrate DocSage's powerful documentation generation into your own web applications and workflows.                                                                                                                                                                                                |
 | **Maintainability**     | Service Layer Architecture                     | Built upon a robust "Service Layer" architectural pattern, promoting separation of concerns, modularity, and easier maintenance. This design makes the codebase highly scalable and extensible for future enhancements.                                                                                                                                                              |
 
 **Example CLI Usage:**
@@ -232,9 +233,49 @@ Details regarding running tests for DocSage v2 were not explicitly provided in t
 
 ## 🔗 API Reference
 
-DocSage v2 is designed as a command-line interface (CLI) tool for generating documentation, not as a standalone web API with exposed endpoints for external consumption. Therefore, there is no public API reference for RESTful endpoints or similar services.
+DocSage v2 exposes a REST API to allow external applications to leverage its documentation generation capabilities.
 
-The project's internal services, such as `src/services/gemini.ts` (exporting `GeminiService`), `src/services/file-system.ts` (exporting functions like `getProjectStructure`, `readFileContent`, `getKeyFilesContent`), and `src/services/logo-generator.ts` (exporting `LogoOptions`, `GeneratedLogo`), are internal modules used by the CLI. These are not intended for direct external API calls.
+### Base URL
+
+```
+https://docsagev2.onrender.com
+```
+
+### Endpoints
+
+#### `POST /api/generate-docs`
+
+Generates a README.md for a given public GitHub repository.
+
+**Request Body:**
+
+```json
+{
+  "repoUrl": "https://github.com/username/repository",
+  "style": "Professional" // Optional: "Professional", "Casual", "Technical"
+}
+```
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "repoName": "repository",
+  "markdown": "# Generated README content...",
+  "stats": {
+    "files": 150,
+    "lines": 12000
+  }
+}
+```
+
+**Example (PowerShell):**
+
+```powershell
+$body = @{ repoUrl = "https://github.com/facebook/react" } | ConvertTo-Json
+Invoke-RestMethod -Method Post -Uri "https://docsagev2.onrender.com/api/generate-docs" -ContentType "application/json" -Body $body
+```
 
 ## ⚙️ Configuration
 

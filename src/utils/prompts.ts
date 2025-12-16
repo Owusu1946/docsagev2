@@ -34,6 +34,7 @@ Your goals:
   \`\`\`
 
 Generate ONLY the Markdown content for the README.md. Do not include introductory text.
+DO NOT wrap the output in a markdown code block (e.g., \`\`\`markdown). Output raw markdown only.
 `;
 
 export const CONTRIBUTING_PROMPT = `
@@ -156,6 +157,8 @@ STRUCTURE (generate ALL sections with RICH content):
 
 REMEMBER: Generate DETAILED, COMPREHENSIVE content. Do NOT be brief. Aim for 350-450 lines.
 Output ONLY valid Markdown.
+DO NOT wrap the entire output in a markdown code block (e.g., do NOT start with \`\`\`markdown and end with \`\`\`).
+Just output the raw markdown text directly.
 `;
 
 
