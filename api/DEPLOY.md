@@ -1,46 +1,32 @@
-# Deployment Guide
+# Deploying DocSage API to Render
 
-The DocSage API is designed to be easily deployable to Vercel (Serverless) or Render (Web Service).
+This repository uses an npm workspace structure. The root directory contains the CLI tool, and the `api/` directory contains the Express API which reuses the core logic.
 
-> **Note:** We recently switched from `git clone` to **Zip Download**. This means the API works perfectly in serverless environments where `git` is not installed!
+## Deployment Steps
 
-## Option 1: Vercel (Recommended for Free Tier)
-Vercel is great for serverless deployment.
+1.  **Create a New Web Service** on Render.
+2.  **Connect your GitHub repository**.
+3.  **Configuration**:
 
-1.  **Push to GitHub**: Ensure this `api` folder is in a GitHub repository.
-2.  **Import to Vercel**:
-    -   Go to [Vercel Dashboard](https://vercel.com/dashboard) and click "Add New Project".
-    -   Select your repository.
-    -   **Root Directory**: Click "Edit" and select `api`.
-    -   **Framework Preset**: Select "Other" (or let it auto-detect, but we have a custom `vercel.json` which it should pick up).
-    -   *Crucial*: We use `src/serverless.ts` as the entry point for Vercel to avoid timeouts (500 Errors).
-3.  **Environment Variables**:
-    -   Add `GEMINI_API_KEY` with your key.
-4.  **Deploy**: Vercel will detect `nest` and build it automatically.
-    -   *Note*: A `vercel.json` file is included to help configuring the serverless function.
+    | Setting | Value |
+    | :--- | :--- |
+    | **Root Directory** | `.` (Leave default / empty) |
+    | **Build Command** | `npm install && npm run build:api` |
+    | **Start Command** | `npm run start:api` |
 
-## Option 2: Render (Recommended for "Always On")
-Render is robust and does not have the execution timeout limits of Vercel Free Tier.
+4.  **Environment Variables**:
+    You MUST set the generic environment variables for the service:
 
-### Method A: Blueprints (Easiest)
-1.  **Push** this code to GitHub.
-2.  Go to [Render Dashboard](https://dashboard.render.com/) -> **Blueprints**.
-3.  Click **New Blueprint Instance**.
-4.  Connect your repository.
-5.  Render will automatically read `api/render.yaml` and set everything up.
-6.  You just need to provide the `GEMINI_API_KEY` when prompted.
+    -   `GEMINI_API_KEY`: Your Google Gemini API Key.
+    -   `NODE_VERSION`: Recommended `20.11.0` or higher.
 
-### Method B: Manual Web Service
-1.  Create **Web Service**.
-2.  **Root Directory**: `api`
-3.  **Build Command**: `npm install && npm run build` (CRITICAL: Do not just use `npm install`)
-4.  **Start Command**: `npm run start:prod` (CRITICAL: Do not use `npm start`)
-5.  **Env Vars**: `GEMINI_API_KEY`
+## How it works
 
-## Testing Deployment
-Once deployed, use your URL:
-```bash
-curl -X POST https://your-app.onrender.com/api/docs/generate \
-  -H "Content-Type: application/json" \
-  -d '{"repoUrl": "https://github.com/nestjs/typescript-starter"}'
-```
+-   The **Build Command** installs dependencies for both the root (CLI) and the `api` workspace, then triggers the API build script (`tsc` inside `api/`).
+-   The **Start Command** runs the compiled API server located at `api/dist/api/src/index.js`.
+-   The API utilizes shared code from `src/` (like `CodebaseScanner`, `GeminiService`, `GitService`) which is compiled into the distribution.
+
+## Troubleshooting
+
+-   **Memory**: Since the API performs codebase analysis (cloning and AST parsing), closely monitor memory usage. If analyzing large repos, you may need a higher tier plan.
+-   **Disk**: The service clones repos to a temporary directory. Render's ephemeral disk is usually sufficient, as we cleanup immediately.
