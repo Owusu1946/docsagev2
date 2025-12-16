@@ -58,7 +58,11 @@ export const generateDocs = async (req: Request, res: Response) => {
 
     } catch (error: any) {
         logger.error(`API Error: ${error.message}`);
-        res.status(500).json({ error: 'Documentation generation failed', details: error.message });
+        res.status(500).json({
+            error: 'Documentation generation failed',
+            details: error.message,
+            stack: error.stack // Temporary for debugging
+        });
     } finally {
         if (tempPath) {
             await gitService.cleanup(tempPath);
