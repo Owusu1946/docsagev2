@@ -24,6 +24,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/typescript.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/json.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/xml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/xml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/markdown.min.js"></script>
+    <!-- Mermaid.js -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
 
     <style>
         :root {
@@ -37,6 +42,49 @@
             --border: #27272a;
             --success: #10b981;
         }
+
+        /* Custom Markdown Highlighting Overrides */
+        .hljs-section {
+            color: #e06c75 !important;
+            font-weight: bold;
+        }
+
+        /* Headers (Red) */
+        .hljs-strong {
+            color: #d19a66 !important;
+            font-weight: bold;
+        }
+
+        /* Bold (Orange) */
+        .hljs-emphasis {
+            color: #c678dd !important;
+            font-style: italic;
+        }
+
+        /* Italic (Purple) */
+        .hljs-code {
+            color: #98c379 !important;
+        }
+
+        /* Inline Code (Green) */
+        .hljs-bullet,
+        .hljs-symbol {
+            color: #61afef !important;
+        }
+
+        /* Lists (Blue) */
+        .hljs-link {
+            color: #56b6c2 !important;
+            text-decoration: underline;
+        }
+
+        /* Links (Cyan) */
+        .hljs-quote {
+            color: #7f848e !important;
+            font-style: italic;
+        }
+
+        /* Quotes (Grey) */
 
         * {
             margin: 0;
@@ -67,6 +115,8 @@
         }
 
         /* Sidebar */
+
+        /* Sidebar */
         .sidebar {
             background: var(--surface);
             border: 1px solid var(--border);
@@ -77,6 +127,13 @@
             height: 100%;
             overflow-y: auto;
             z-index: 20;
+            /* Hide scrollbar */
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .sidebar::-webkit-scrollbar {
+            display: none;
         }
 
         .brand {
@@ -327,6 +384,82 @@
             color: var(--primary);
         }
 
+        /* Chat View */
+        .chat-view {
+            display: flex;
+            flex-direction: column;
+            padding: 0 !important;
+            /* Override default padding */
+            overflow: hidden !important;
+        }
+
+        .chat-messages {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .chat-input-area {
+            background: var(--surface);
+            border-top: 1px solid var(--border);
+            padding: 1.5rem;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .message {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            max-width: 85%;
+        }
+
+        .message.user {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+
+        .message.bot {
+            align-self: flex-start;
+        }
+
+        .message-content {
+            background: var(--surface-hover);
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: #d4d4d8;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .message.user .message-content {
+            background: var(--primary);
+            color: white;
+            border-bottom-right-radius: 2px;
+        }
+
+        .message.bot .message-content {
+            border-bottom-left-radius: 2px;
+            border: 1px solid var(--border);
+        }
+
+        .message-content pre {
+            background: rgba(0, 0, 0, 0.3) !important;
+            padding: 0.8rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 0.8rem 0;
+        }
+
+        .message-content code {
+            font-family: 'JetBrains Mono';
+            font-size: 0.85em;
+        }
+
         .preview-view code {
             background: #27272a;
             padding: 2px 6px;
@@ -529,7 +662,7 @@
         <!-- Config Panel -->
         <div class="sidebar">
             <div class="brand">
-                <i class='bx bxs-bot'></i> DocSage <span
+                DocSage <span
                     style="font-size:0.8rem; background: var(--surface-hover); padding: 2px 6px; border-radius: 4px; border: 1px solid var(--border); color: var(--text-muted);">PRO</span>
             </div>
 
@@ -566,6 +699,11 @@
                 <i class='bx bxs-magic-wand'></i> Analyz & Generate
             </button>
 
+            <button class="btn-generate" onclick="generateChangelog()" id="changelogBtn"
+                style="background: var(--surface-hover); border: 1px solid var(--border); margin-top: 0.5rem; color: var(--text);">
+                <i class='bx bx-list-ul'></i> Generate Changelog
+            </button>
+
             <div style="flex-grow: 1"></div>
 
             <div style="margin-top: 2rem; border-top: 1px solid var(--border); padding-top: 1rem;">
@@ -583,6 +721,7 @@
                     <button class="tab-btn active" onclick="switchTab('preview')"><i class='bx bx-show'></i>
                         Preview</button>
                     <button class="tab-btn" onclick="switchTab('code')"><i class='bx bx-code-alt'></i> Markdown</button>
+                    <button class="tab-btn" onclick="switchTab('chat')"><i class='bx bx-chat'></i> Chat</button>
                 </div>
                 <div style="display:flex; gap: 0.5rem;">
                     <button class="tool-btn" onclick="copyDocs()" title="Copy Markdown"><i
@@ -616,6 +755,24 @@
                     </div>
                 </div>
                 <div id="code-view" class="view-layer code-view"></div>
+
+                <!-- Chat View -->
+                <div id="chat-view" class="view-layer chat-view">
+                    <div class="chat-messages" id="chat-messages">
+                        <div class="message bot">
+                            <div class="message-content">
+                                👋 Hi! I'm DocSage. Once you analyze a repo, ask me anything about it here! <br>
+                                <small style="opacity:0.6">(e.g., "Where is the auth logic?", "Explain the DB
+                                    schema")</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chat-input-area">
+                        <input type="text" id="chat-input" placeholder="Ask a question about the codebase..."
+                            onkeypress="handleChatEnter(event)">
+                        <button onclick="sendChatMessage()" id="send-chat-btn"><i class='bx bx-send'></i></button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -703,20 +860,136 @@
             canvasAnimationId = requestAnimationFrame(animateNetwork);
         }
 
+        // Initialize Mermaid
+        mermaid.initialize({
+            startOnLoad: false,
+            theme: 'dark',
+            securityLevel: 'loose',
+            fontFamily: 'Space Grotesk'
+        });
+
         // --- Core Logic ---
         loadHistory();
 
         function switchTab(tab) {
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            if (tab === 'preview') {
-                document.querySelector('.tab-btn:first-child').classList.add('active');
-            } else {
-                document.querySelector('.tab-btn:last-child').classList.add('active');
-            }
+            document.querySelectorAll('.tab-btn').forEach(b => {
+                b.classList.remove('active');
+                if (b.onclick.toString().includes(tab)) b.classList.add('active');
+            });
 
             document.querySelectorAll('.view-layer').forEach(v => v.classList.remove('active'));
             document.getElementById(tab + '-view').classList.add('active');
         }
+
+        // --- Chat Logic ---
+        async function sendChatMessage() {
+            const input = document.getElementById('chat-input');
+            const message = input.value.trim();
+            const repoUrl = document.getElementById('repoUrl').value;
+            const chatMessages = document.getElementById('chat-messages');
+
+            if (!message) return;
+            if (!repoUrl) return showToast('Please enter a Repo URL first', true);
+
+            // Add User Message
+            appendMessage('user', message);
+            input.value = '';
+
+            // Show Typing Indicator
+            const typingId = appendTypingIndicator();
+            scrollToBottom();
+
+            try {
+                const response = await fetch('http://localhost:3000/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        repoUrl,
+                        message,
+                        history: getChatHistory() // Simple caching if implemented, or empty
+                    })
+                });
+
+                const data = await response.json();
+
+                // Remove Typing Indicator
+                document.getElementById(typingId).remove();
+
+                if (data.success) {
+                    appendMessage('bot', data.reply);
+                } else {
+                    appendMessage('bot', `⚠️ Error: ${data.error || 'Failed to get answer'}`);
+                }
+
+            } catch (err) {
+                document.getElementById(typingId)?.remove();
+                appendMessage('bot', `⚠️ Connection Error: ${err.message}`);
+            }
+            scrollToBottom();
+        }
+
+        function appendMessage(role, text) {
+            const container = document.getElementById('chat-messages');
+            const div = document.createElement('div');
+            div.className = `message ${role}`;
+
+            let contentHtml = text;
+            if (role === 'bot') {
+                // Parse markdown for bot messages
+                contentHtml = DOMPurify.sanitize(marked.parse(text));
+            }
+
+            div.innerHTML = `
+                <div class="message-content">
+                    ${contentHtml}
+                </div>
+            `;
+            container.appendChild(div);
+
+            // Highlight code blocks
+            if (role === 'bot') {
+                div.querySelectorAll('pre code').forEach((block) => {
+                    hljs.highlightElement(block);
+                });
+            }
+        }
+
+        function appendTypingIndicator() {
+            const container = document.getElementById('chat-messages');
+            const id = 'typing-' + Date.now();
+            const div = document.createElement('div');
+            div.id = id;
+            div.className = 'message bot';
+            div.innerHTML = `
+                <div class="message-content" style="padding: 0.8rem 1.2rem; display:flex; align-items:center; gap:4px;">
+                    <span class="dot" style="animation: bounce 1.4s infinite ease-in-out both; background:#fff; width:6px; height:6px; border-radius:50%;"></span>
+                    <span class="dot" style="animation: bounce 1.4s infinite ease-in-out both 0.16s; background:#fff; width:6px; height:6px; border-radius:50%;"></span>
+                    <span class="dot" style="animation: bounce 1.4s infinite ease-in-out both 0.32s; background:#fff; width:6px; height:6px; border-radius:50%;"></span>
+                </div>
+            `;
+            container.appendChild(div);
+            return id;
+        }
+
+        function handleChatEnter(e) {
+            if (e.key === 'Enter') sendChatMessage();
+        }
+
+        function scrollToBottom() {
+            const container = document.getElementById('chat-messages');
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function getChatHistory() {
+            // Optional: Grab last few messages from DOM to send as context
+            // For now return empty (stateless logic in plan)
+            return [];
+        }
+
+        // Add bounce style for typing
+        const style = document.createElement('style');
+        style.innerHTML = `@keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }`;
+        document.head.appendChild(style);
 
         async function generateDocs() {
             const repoUrl = document.getElementById('repoUrl').value;
@@ -730,7 +1003,7 @@
             addToHistory(repoUrl);
 
             try {
-                const API_URL = 'https://docsagev2.onrender.com/api/generate-docs';
+                const API_URL = 'http://localhost:3000/api/generate-docs';
 
                 const response = await fetch(API_URL, {
                     method: 'POST',
@@ -758,14 +1031,32 @@
         }
 
         function renderOutput() {
-            document.getElementById('code-view').textContent = currentMarkdown;
+            // Render Preview
             const cleanHtml = DOMPurify.sanitize(marked.parse(currentMarkdown));
             document.getElementById('preview-view').innerHTML = cleanHtml;
 
-            // Syntax Highlight
+            // 3. Render Source with Syntax Highlighting
+            const codeView = document.getElementById('code-view');
+            codeView.innerHTML = `<pre style="margin:0; background:transparent;"><code class="language-markdown" style="background:transparent; padding:0;"></code></pre>`;
+            codeView.querySelector('code').textContent = currentMarkdown;
+
+            // 4. Apply Highlight.js to all blocks
             document.querySelectorAll('pre code').forEach((block) => {
-                hljs.highlightElement(block);
+                // If it's a mermaid block in preview, don't highlight it as code, we want to render it
+                if (block.classList.contains('language-mermaid')) {
+                    // Convert to divine element for mermaid processing
+                    const pre = block.parentElement;
+                    const div = document.createElement('div');
+                    div.className = 'mermaid';
+                    div.textContent = block.textContent;
+                    pre.replaceWith(div);
+                } else {
+                    hljs.highlightElement(block);
+                }
             });
+
+            // 5. Render Mermaid Diagrams
+            mermaid.init(undefined, document.querySelectorAll('.mermaid'));
         }
 
         // --- High-Fidelity Simulator ---
@@ -884,6 +1175,68 @@
         }
 
         window.addEventListener('resize', resizeCanvas);
+
+        // Helper functions for loader
+        function toggleLoader(show, title) {
+            const loader = document.getElementById('loader');
+            loader.style.display = show ? 'flex' : 'none';
+            if (show && title) {
+                document.getElementById('phase-title').textContent = title;
+                document.getElementById('phase-log').textContent = 'Processing...';
+            }
+        }
+
+        function updateLoader(title, log) {
+            if (title) document.getElementById('phase-title').textContent = title;
+            if (log) document.getElementById('phase-log').textContent = log;
+        }
+
+        function simulateFileScroll() {
+            const scroller = document.getElementById('file-scroller');
+            scroller.innerHTML = ''; // Request clear
+            const div = document.createElement('div');
+            div.className = 'file-entry';
+            div.innerHTML = `<span style="color:#52525b">GIT</span> Fetching commit history...`;
+            scroller.appendChild(div);
+        }
+
+        async function generateChangelog() {
+            const repoUrl = document.getElementById('repoUrl').value;
+            if (!repoUrl) return showToast('Please enter a Repo URL', true);
+
+            toggleLoader(true, 'Initializing connection...');
+
+            try {
+                // Simulate steps
+                updateLoader('Cloning repository...', 'git clone --depth 1 ...');
+                simulateFileScroll();
+
+                const response = await fetch('http://localhost:3000/api/changelog', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ repoUrl, limit: 100 })
+                });
+
+                if (!response.ok) throw new Error('Failed to generate changelog');
+
+                const data = await response.json();
+
+                toggleLoader(false);
+                if (data.success) {
+                    currentMarkdown = data.changelog;
+                    renderOutput();
+                    switchTab('preview');
+                    // addToHistory(repoUrl, 'Changelog'); // addToHistory signature might be different, keeping it simple
+                    showToast('Changelog generated successfully!');
+                } else {
+                    showToast('Error: ' + data.error, true);
+                }
+
+            } catch (error) {
+                toggleLoader(false);
+                showToast(error.message, true);
+            }
+        }
     </script>
 
 </body>

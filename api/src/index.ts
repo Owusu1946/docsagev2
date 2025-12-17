@@ -2,6 +2,8 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { generateDocs } from './controllers/docs.controller.js';
+import { chatWithRepo } from './controllers/chat.controller.js';
+import { generateChangelog } from './controllers/changelog.controller.js';
 
 dotenv.config();
 
@@ -11,7 +13,14 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-// Health check
+// ... existing health checks ...
+
+// Generate Docs Endpoint
+app.post('/api/generate-docs', generateDocs);
+
+// Chat Endpoint
+app.post('/api/chat', chatWithRepo);
+app.post('/api/changelog', generateChangelog);
 // Health check (Keep-alive target)
 app.get('/', (req, res) => {
     res.send('DocSage v2 API is running 🚀');

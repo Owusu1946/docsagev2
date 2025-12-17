@@ -1,7 +1,7 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import dotenv from 'dotenv';
 import { getKeyFilesContent, getProjectStructure } from './file-system.js';
-import { README_PROMPT, CONTRIBUTING_PROMPT, README_ADVANCED_PROMPT } from '../utils/prompts.js';
+import { README_PROMPT, CONTRIBUTING_PROMPT, README_ADVANCED_PROMPT, CHANGELOG_PROMPT } from '../utils/prompts.js';
 import type { CodebaseAnalysis } from './codebase-scanner.js';
 
 dotenv.config();
@@ -321,5 +321,63 @@ export class GeminiService {
       }
     }
     throw lastError;
+  }
+  /**
+   * Chat with the codebase using RAG-like context
+   */
+  async chatTheCodebase(
+    message: string,
+    contextArgs: {
+      structure: string;
+      keyFiles: string;
+      history?: { role: string; text: string }[];
+    }
+  ): Promise<string> {
+    const { structure, keyFiles, history } = contextArgs;
+
+    // Construct the full prompt context
+    const contextPrompt = `
+      ${// @ts-ignore
+      (await import('../utils/prompts.js')).CHAT_SYSTEM_PROMPT}
+
+      === PROJECT STRUCTURE ===
+      ${structure}
+
+      === KEY FILES CONTENT ===
+      ${keyFiles}
+
+      === CHAT HISTORY ===
+      ${history?.map(h => `${h.role}: ${h.text}`).join('\n') || 'No previous history.'}
+
+      === USER QUESTION ===
+      ${message}
+    `;
+
+    return this.retryOperation(async () => {
+      const result = await this.model.generateContent(contextPrompt);
+      const response = await result.response;
+      return response.text();
+    });
+  }
+
+
+  /**
+   * Generates a CHANGELOG.md from git commit history
+   */
+  async generateChangelog(commits: { hash: string; author: string; date: string; message: string }[]): Promise<string> {
+    const commitsText = commits.map(c => `${c.hash} | ${c.author} | ${c.date} | ${c.message}`).join('\n');
+
+    const prompt = `
+      ${CHANGELOG_PROMPT}
+
+      === COMMIT LOG ===
+      ${commitsText}
+    `;
+
+    return this.retryOperation(async () => {
+      const result = await this.model.generateContent(prompt);
+      const response = await result.response;
+      return response.text();
+    });
   }
 }

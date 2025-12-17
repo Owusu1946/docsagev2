@@ -55,4 +55,45 @@ export class GitService {
     isValidUrl(url: string): boolean {
         return url.startsWith('https://github.com/') || url.startsWith('git@github.com:');
     }
+
+    /**
+     * Retrieves the commit log from the repository
+     */
+    async getCommitLog(repoPath: string, limit: number = 50): Promise<CommitEntry[]> {
+        return new Promise((resolve, reject) => {
+            // Format: %H|%an|%ad|%s (Hash|Author|Date|Subject)
+            const git = spawn('git', ['log', `-${limit}`, '--pretty=format:%H|%an|%ad|%s', '--date=short'], { cwd: repoPath });
+
+            let output = '';
+
+            git.stdout.on('data', (data) => {
+                output += data.toString();
+            });
+
+            git.on('close', (code) => {
+                if (code === 0) {
+                    const commits = output.split('\n')
+                        .filter(line => line.trim())
+                        .map(line => {
+                            const [hash, author, date, message] = line.split('|');
+                            return { hash, author, date, message };
+                        });
+                    resolve(commits);
+                } else {
+                    reject(new Error(`Git log failed with code ${code}`));
+                }
+            });
+
+            git.on('error', (err) => {
+                reject(err);
+            });
+        });
+    }
+}
+
+export interface CommitEntry {
+    hash: string;
+    author: string;
+    date: string;
+    message: string;
 }
